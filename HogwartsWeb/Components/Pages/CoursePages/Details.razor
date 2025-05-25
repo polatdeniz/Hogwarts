@@ -1,0 +1,50 @@
+﻿@page "/courses/details"
+@using Microsoft.EntityFrameworkCore
+@using Hogwarts
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Course</h2>
+    <hr />
+    @if (course is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">CourseName</dt>
+            <dd class="col-sm-10">@course.CourseName</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@course.Description</dd>
+            <dt class="col-sm-2">ProfessorId</dt>
+            <dd class="col-sm-10">@course.ProfessorId</dd>
+        </dl>
+        <div>
+            <a href="@($"/courses/edit?courseid={course.CourseId}")">Edit</a> |
+            <a href="@($"/courses")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Course? course;
+
+    [SupplyParameterFromQuery]
+    private int CourseId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        course = await context.Course.FirstOrDefaultAsync(m => m.CourseId == CourseId);
+
+        if (course is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

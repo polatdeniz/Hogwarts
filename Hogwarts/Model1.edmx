@@ -1,0 +1,691 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="HogwardsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseId" />
+          </Key>
+          <Property Name="CourseId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CourseName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="255" />
+          <Property Name="ProfessorId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Enrollment">
+          <Key>
+            <PropertyRef Name="EnrollmentId" />
+          </Key>
+          <Property Name="EnrollmentId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StudentId" Type="int" Nullable="false" />
+          <Property Name="CourseId" Type="int" Nullable="false" />
+          <Property Name="ProfessorId" Type="int" Nullable="false" />
+          <Property Name="EnrollmentDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="House">
+          <Key>
+            <PropertyRef Name="HouseId" />
+          </Key>
+          <Property Name="HouseId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="HouseName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Founder" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Symbol" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Colors" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Pet">
+          <Key>
+            <PropertyRef Name="PetId" />
+          </Key>
+          <Property Name="PetId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PetName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Species" Type="varchar" MaxLength="50" />
+          <Property Name="StudentId" Type="int" />
+          <Property Name="ProfessorId" Type="int" />
+        </EntityType>
+        <EntityType Name="Professor">
+          <Key>
+            <PropertyRef Name="ProfessorId" />
+          </Key>
+          <Property Name="ProfessorId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FirstName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="LastName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Specialty" Type="varchar" MaxLength="100" />
+          <Property Name="Level" Type="int" Nullable="false" />
+          <Property Name="HouseId" Type="int" />
+        </EntityType>
+        <EntityType Name="Spell">
+          <Key>
+            <PropertyRef Name="SpellId" />
+          </Key>
+          <Property Name="SpellId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SpellName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Effect" Type="varchar" MaxLength="255" />
+          <Property Name="RequiredLevel" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Student">
+          <Key>
+            <PropertyRef Name="StudentId" />
+          </Key>
+          <Property Name="StudentId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FirstName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="LastName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Level" Type="int" Nullable="false" />
+          <Property Name="HouseId" Type="int" Nullable="false" />
+          <Property Name="WandId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Wand">
+          <Key>
+            <PropertyRef Name="WandId" />
+          </Key>
+          <Property Name="WandId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Core" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Material" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="LastMaintenanceDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="WandMaintenanceAlert">
+          <Key>
+            <PropertyRef Name="AlertId" />
+          </Key>
+          <Property Name="AlertId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="WandId" Type="int" Nullable="false" />
+          <Property Name="AlertDate" Type="datetime" Nullable="false" />
+          <Property Name="Message" Type="varchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Course_Professor">
+          <End Role="Professor" Type="Self.Professor" Multiplicity="1" />
+          <End Role="Course" Type="Self.Course" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Professor">
+              <PropertyRef Name="ProfessorId" />
+            </Principal>
+            <Dependent Role="Course">
+              <PropertyRef Name="ProfessorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Enrollment_Course">
+          <End Role="Course" Type="Self.Course" Multiplicity="1" />
+          <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseId" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="CourseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Enrollment_Professor">
+          <End Role="Professor" Type="Self.Professor" Multiplicity="1" />
+          <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Professor">
+              <PropertyRef Name="ProfessorId" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="ProfessorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Enrollment_Student">
+          <End Role="Student" Type="Self.Student" Multiplicity="1" />
+          <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentId" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Pet_Professor">
+          <End Role="Professor" Type="Self.Professor" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Pet" Type="Self.Pet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Professor">
+              <PropertyRef Name="ProfessorId" />
+            </Principal>
+            <Dependent Role="Pet">
+              <PropertyRef Name="ProfessorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Pet_Student">
+          <End Role="Student" Type="Self.Student" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Pet" Type="Self.Pet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentId" />
+            </Principal>
+            <Dependent Role="Pet">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Professor_House">
+          <End Role="House" Type="Self.House" Multiplicity="0..1" />
+          <End Role="Professor" Type="Self.Professor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="House">
+              <PropertyRef Name="HouseId" />
+            </Principal>
+            <Dependent Role="Professor">
+              <PropertyRef Name="HouseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_House">
+          <End Role="House" Type="Self.House" Multiplicity="1" />
+          <End Role="Student" Type="Self.Student" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="House">
+              <PropertyRef Name="HouseId" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="HouseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_Wand">
+          <End Role="Wand" Type="Self.Wand" Multiplicity="1" />
+          <End Role="Student" Type="Self.Student" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Wand">
+              <PropertyRef Name="WandId" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="WandId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WandMaintenanceAlert_Wand">
+          <End Role="Wand" Type="Self.Wand" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="WandMaintenanceAlert" Type="Self.WandMaintenanceAlert" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Wand">
+              <PropertyRef Name="WandId" />
+            </Principal>
+            <Dependent Role="WandMaintenanceAlert">
+              <PropertyRef Name="WandId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="HogwardsModelStoreContainer">
+          <EntitySet Name="Course" EntityType="Self.Course" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Enrollment" EntityType="Self.Enrollment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="House" EntityType="Self.House" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Pet" EntityType="Self.Pet" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Professor" EntityType="Self.Professor" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Spell" EntityType="Self.Spell" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Wand" EntityType="Self.Wand" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="WandMaintenanceAlert" EntityType="Self.WandMaintenanceAlert" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Course_Professor" Association="Self.FK_Course_Professor">
+            <End Role="Professor" EntitySet="Professor" />
+            <End Role="Course" EntitySet="Course" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Enrollment_Course" Association="Self.FK_Enrollment_Course">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="Enrollment" EntitySet="Enrollment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Enrollment_Professor" Association="Self.FK_Enrollment_Professor">
+            <End Role="Professor" EntitySet="Professor" />
+            <End Role="Enrollment" EntitySet="Enrollment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Enrollment_Student" Association="Self.FK_Enrollment_Student">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="Enrollment" EntitySet="Enrollment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Pet_Professor" Association="Self.FK_Pet_Professor">
+            <End Role="Professor" EntitySet="Professor" />
+            <End Role="Pet" EntitySet="Pet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Pet_Student" Association="Self.FK_Pet_Student">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="Pet" EntitySet="Pet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Professor_House" Association="Self.FK_Professor_House">
+            <End Role="House" EntitySet="House" />
+            <End Role="Professor" EntitySet="Professor" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_House" Association="Self.FK_Student_House">
+            <End Role="House" EntitySet="House" />
+            <End Role="Student" EntitySet="Student" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_Wand" Association="Self.FK_Student_Wand">
+            <End Role="Wand" EntitySet="Wand" />
+            <End Role="Student" EntitySet="Student" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WandMaintenanceAlert_Wand" Association="Self.FK_WandMaintenanceAlert_Wand">
+            <End Role="Wand" EntitySet="Wand" />
+            <End Role="WandMaintenanceAlert" EntitySet="WandMaintenanceAlert" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="HogwardsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseId" />
+          </Key>
+          <Property Name="CourseId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CourseName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ProfessorId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Professor" Relationship="Self.FK_Course_Professor" FromRole="Course" ToRole="Professor" />
+          <NavigationProperty Name="Enrollments" Relationship="Self.FK_Enrollment_Course" FromRole="Course" ToRole="Enrollment" />
+        </EntityType>
+        <EntityType Name="Enrollment">
+          <Key>
+            <PropertyRef Name="EnrollmentId" />
+          </Key>
+          <Property Name="EnrollmentId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" Nullable="false" />
+          <Property Name="CourseId" Type="Int32" Nullable="false" />
+          <Property Name="ProfessorId" Type="Int32" Nullable="false" />
+          <Property Name="EnrollmentDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Course" Relationship="Self.FK_Enrollment_Course" FromRole="Enrollment" ToRole="Course" />
+          <NavigationProperty Name="Professor" Relationship="Self.FK_Enrollment_Professor" FromRole="Enrollment" ToRole="Professor" />
+          <NavigationProperty Name="Student" Relationship="Self.FK_Enrollment_Student" FromRole="Enrollment" ToRole="Student" />
+        </EntityType>
+        <EntityType Name="House">
+          <Key>
+            <PropertyRef Name="HouseId" />
+          </Key>
+          <Property Name="HouseId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="HouseName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Founder" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Symbol" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Colors" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Professors" Relationship="Self.FK_Professor_House" FromRole="House" ToRole="Professor" />
+          <NavigationProperty Name="Students" Relationship="Self.FK_Student_House" FromRole="House" ToRole="Student" />
+        </EntityType>
+        <EntityType Name="Pet">
+          <Key>
+            <PropertyRef Name="PetId" />
+          </Key>
+          <Property Name="PetId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PetName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Species" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="StudentId" Type="Int32" />
+          <Property Name="ProfessorId" Type="Int32" />
+          <NavigationProperty Name="Professor" Relationship="Self.FK_Pet_Professor" FromRole="Pet" ToRole="Professor" />
+          <NavigationProperty Name="Student" Relationship="Self.FK_Pet_Student" FromRole="Pet" ToRole="Student" />
+        </EntityType>
+        <EntityType Name="Professor">
+          <Key>
+            <PropertyRef Name="ProfessorId" />
+          </Key>
+          <Property Name="ProfessorId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Specialty" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Level" Type="Int32" Nullable="false" />
+          <Property Name="HouseId" Type="Int32" />
+          <NavigationProperty Name="Courses" Relationship="Self.FK_Course_Professor" FromRole="Professor" ToRole="Course" />
+          <NavigationProperty Name="Enrollments" Relationship="Self.FK_Enrollment_Professor" FromRole="Professor" ToRole="Enrollment" />
+          <NavigationProperty Name="House" Relationship="Self.FK_Professor_House" FromRole="Professor" ToRole="House" />
+          <NavigationProperty Name="Pets" Relationship="Self.FK_Pet_Professor" FromRole="Professor" ToRole="Pet" />
+        </EntityType>
+        <EntityType Name="Spell">
+          <Key>
+            <PropertyRef Name="SpellId" />
+          </Key>
+          <Property Name="SpellId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SpellName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Effect" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="RequiredLevel" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Student">
+          <Key>
+            <PropertyRef Name="StudentId" />
+          </Key>
+          <Property Name="StudentId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Level" Type="Int32" Nullable="false" />
+          <Property Name="HouseId" Type="Int32" Nullable="false" />
+          <Property Name="WandId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Enrollments" Relationship="Self.FK_Enrollment_Student" FromRole="Student" ToRole="Enrollment" />
+          <NavigationProperty Name="House" Relationship="Self.FK_Student_House" FromRole="Student" ToRole="House" />
+          <NavigationProperty Name="Pets" Relationship="Self.FK_Pet_Student" FromRole="Student" ToRole="Pet" />
+          <NavigationProperty Name="Wand" Relationship="Self.FK_Student_Wand" FromRole="Student" ToRole="Wand" />
+        </EntityType>
+        <EntityType Name="Wand">
+          <Key>
+            <PropertyRef Name="WandId" />
+          </Key>
+          <Property Name="WandId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Core" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Material" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="LastMaintenanceDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Students" Relationship="Self.FK_Student_Wand" FromRole="Wand" ToRole="Student" />
+          <NavigationProperty Name="WandMaintenanceAlerts" Relationship="Self.FK_WandMaintenanceAlert_Wand" FromRole="Wand" ToRole="WandMaintenanceAlert" />
+        </EntityType>
+        <EntityType Name="WandMaintenanceAlert">
+          <Key>
+            <PropertyRef Name="AlertId" />
+          </Key>
+          <Property Name="AlertId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="WandId" Type="Int32" Nullable="false" />
+          <Property Name="AlertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Message" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Wand" Relationship="Self.FK_WandMaintenanceAlert_Wand" FromRole="WandMaintenanceAlert" ToRole="Wand" />
+        </EntityType>
+        <Association Name="FK_Course_Professor">
+          <End Role="Professor" Type="Self.Professor" Multiplicity="1" />
+          <End Role="Course" Type="Self.Course" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Professor">
+              <PropertyRef Name="ProfessorId" />
+            </Principal>
+            <Dependent Role="Course">
+              <PropertyRef Name="ProfessorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Enrollment_Course">
+          <End Role="Course" Type="Self.Course" Multiplicity="1" />
+          <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseId" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="CourseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Enrollment_Professor">
+          <End Role="Professor" Type="Self.Professor" Multiplicity="1" />
+          <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Professor">
+              <PropertyRef Name="ProfessorId" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="ProfessorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Enrollment_Student">
+          <End Role="Student" Type="Self.Student" Multiplicity="1" />
+          <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentId" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Professor_House">
+          <End Role="House" Type="Self.House" Multiplicity="0..1" />
+          <End Role="Professor" Type="Self.Professor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="House">
+              <PropertyRef Name="HouseId" />
+            </Principal>
+            <Dependent Role="Professor">
+              <PropertyRef Name="HouseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_House">
+          <End Role="House" Type="Self.House" Multiplicity="1" />
+          <End Role="Student" Type="Self.Student" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="House">
+              <PropertyRef Name="HouseId" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="HouseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Pet_Professor">
+          <End Role="Professor" Type="Self.Professor" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Pet" Type="Self.Pet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Professor">
+              <PropertyRef Name="ProfessorId" />
+            </Principal>
+            <Dependent Role="Pet">
+              <PropertyRef Name="ProfessorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Pet_Student">
+          <End Role="Student" Type="Self.Student" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Pet" Type="Self.Pet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentId" />
+            </Principal>
+            <Dependent Role="Pet">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Student_Wand">
+          <End Role="Wand" Type="Self.Wand" Multiplicity="1" />
+          <End Role="Student" Type="Self.Student" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Wand">
+              <PropertyRef Name="WandId" />
+            </Principal>
+            <Dependent Role="Student">
+              <PropertyRef Name="WandId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WandMaintenanceAlert_Wand">
+          <End Role="Wand" Type="Self.Wand" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="WandMaintenanceAlert" Type="Self.WandMaintenanceAlert" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Wand">
+              <PropertyRef Name="WandId" />
+            </Principal>
+            <Dependent Role="WandMaintenanceAlert">
+              <PropertyRef Name="WandId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="HogwardsEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Courses" EntityType="Self.Course" />
+          <EntitySet Name="Enrollments" EntityType="Self.Enrollment" />
+          <EntitySet Name="Houses" EntityType="Self.House" />
+          <EntitySet Name="Pets" EntityType="Self.Pet" />
+          <EntitySet Name="Professors" EntityType="Self.Professor" />
+          <EntitySet Name="Spells" EntityType="Self.Spell" />
+          <EntitySet Name="Students" EntityType="Self.Student" />
+          <EntitySet Name="Wands" EntityType="Self.Wand" />
+          <EntitySet Name="WandMaintenanceAlerts" EntityType="Self.WandMaintenanceAlert" />
+          <AssociationSet Name="FK_Course_Professor" Association="Self.FK_Course_Professor">
+            <End Role="Professor" EntitySet="Professors" />
+            <End Role="Course" EntitySet="Courses" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Enrollment_Course" Association="Self.FK_Enrollment_Course">
+            <End Role="Course" EntitySet="Courses" />
+            <End Role="Enrollment" EntitySet="Enrollments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Enrollment_Professor" Association="Self.FK_Enrollment_Professor">
+            <End Role="Professor" EntitySet="Professors" />
+            <End Role="Enrollment" EntitySet="Enrollments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Enrollment_Student" Association="Self.FK_Enrollment_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="Enrollment" EntitySet="Enrollments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Professor_House" Association="Self.FK_Professor_House">
+            <End Role="House" EntitySet="Houses" />
+            <End Role="Professor" EntitySet="Professors" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_House" Association="Self.FK_Student_House">
+            <End Role="House" EntitySet="Houses" />
+            <End Role="Student" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Pet_Professor" Association="Self.FK_Pet_Professor">
+            <End Role="Professor" EntitySet="Professors" />
+            <End Role="Pet" EntitySet="Pets" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Pet_Student" Association="Self.FK_Pet_Student">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="Pet" EntitySet="Pets" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Student_Wand" Association="Self.FK_Student_Wand">
+            <End Role="Wand" EntitySet="Wands" />
+            <End Role="Student" EntitySet="Students" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WandMaintenanceAlert_Wand" Association="Self.FK_WandMaintenanceAlert_Wand">
+            <End Role="Wand" EntitySet="Wands" />
+            <End Role="WandMaintenanceAlert" EntitySet="WandMaintenanceAlerts" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="HogwardsModelStoreContainer" CdmEntityContainer="HogwardsEntities">
+          <EntitySetMapping Name="Courses">
+            <EntityTypeMapping TypeName="HogwardsModel.Course">
+              <MappingFragment StoreEntitySet="Course">
+                <ScalarProperty Name="CourseId" ColumnName="CourseId" />
+                <ScalarProperty Name="CourseName" ColumnName="CourseName" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="ProfessorId" ColumnName="ProfessorId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Enrollments">
+            <EntityTypeMapping TypeName="HogwardsModel.Enrollment">
+              <MappingFragment StoreEntitySet="Enrollment">
+                <ScalarProperty Name="EnrollmentId" ColumnName="EnrollmentId" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="CourseId" ColumnName="CourseId" />
+                <ScalarProperty Name="ProfessorId" ColumnName="ProfessorId" />
+                <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Houses">
+            <EntityTypeMapping TypeName="HogwardsModel.House">
+              <MappingFragment StoreEntitySet="House">
+                <ScalarProperty Name="HouseId" ColumnName="HouseId" />
+                <ScalarProperty Name="HouseName" ColumnName="HouseName" />
+                <ScalarProperty Name="Founder" ColumnName="Founder" />
+                <ScalarProperty Name="Symbol" ColumnName="Symbol" />
+                <ScalarProperty Name="Colors" ColumnName="Colors" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Pets">
+            <EntityTypeMapping TypeName="HogwardsModel.Pet">
+              <MappingFragment StoreEntitySet="Pet">
+                <ScalarProperty Name="PetId" ColumnName="PetId" />
+                <ScalarProperty Name="PetName" ColumnName="PetName" />
+                <ScalarProperty Name="Species" ColumnName="Species" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="ProfessorId" ColumnName="ProfessorId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Professors">
+            <EntityTypeMapping TypeName="HogwardsModel.Professor">
+              <MappingFragment StoreEntitySet="Professor">
+                <ScalarProperty Name="ProfessorId" ColumnName="ProfessorId" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="Specialty" ColumnName="Specialty" />
+                <ScalarProperty Name="Level" ColumnName="Level" />
+                <ScalarProperty Name="HouseId" ColumnName="HouseId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Spells">
+            <EntityTypeMapping TypeName="HogwardsModel.Spell">
+              <MappingFragment StoreEntitySet="Spell">
+                <ScalarProperty Name="SpellId" ColumnName="SpellId" />
+                <ScalarProperty Name="SpellName" ColumnName="SpellName" />
+                <ScalarProperty Name="Effect" ColumnName="Effect" />
+                <ScalarProperty Name="RequiredLevel" ColumnName="RequiredLevel" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Students">
+            <EntityTypeMapping TypeName="HogwardsModel.Student">
+              <MappingFragment StoreEntitySet="Student">
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="Level" ColumnName="Level" />
+                <ScalarProperty Name="HouseId" ColumnName="HouseId" />
+                <ScalarProperty Name="WandId" ColumnName="WandId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Wands">
+            <EntityTypeMapping TypeName="HogwardsModel.Wand">
+              <MappingFragment StoreEntitySet="Wand">
+                <ScalarProperty Name="WandId" ColumnName="WandId" />
+                <ScalarProperty Name="Core" ColumnName="Core" />
+                <ScalarProperty Name="Material" ColumnName="Material" />
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="LastMaintenanceDate" ColumnName="LastMaintenanceDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WandMaintenanceAlerts">
+            <EntityTypeMapping TypeName="HogwardsModel.WandMaintenanceAlert">
+              <MappingFragment StoreEntitySet="WandMaintenanceAlert">
+                <ScalarProperty Name="AlertId" ColumnName="AlertId" />
+                <ScalarProperty Name="WandId" ColumnName="WandId" />
+                <ScalarProperty Name="AlertDate" ColumnName="AlertDate" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
