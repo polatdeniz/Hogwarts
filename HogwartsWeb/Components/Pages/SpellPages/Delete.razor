@@ -1,0 +1,63 @@
+﻿@page "/spells/delete"
+@using Microsoft.EntityFrameworkCore
+@using Hogwarts
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Spell</h2>
+    <hr />
+    @if (spell is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">SpellName</dt>
+            <dd class="col-sm-10">@spell.SpellName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Effect</dt>
+            <dd class="col-sm-10">@spell.Effect</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">RequiredLevel</dt>
+            <dd class="col-sm-10">@spell.RequiredLevel</dd>
+        </dl>
+        <EditForm method="post" Model="spell" OnValidSubmit="DeleteSpell" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(spell is null)">Delete</button> |
+            <a href="/spells">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Spell? spell;
+
+    [SupplyParameterFromQuery]
+    private int SpellId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        spell = await context.Spell.FirstOrDefaultAsync(m => m.SpellId == SpellId);
+
+        if (spell is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteSpell()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Spell.Remove(spell!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/spells");
+    }
+}

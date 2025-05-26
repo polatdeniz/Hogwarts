@@ -15,11 +15,11 @@
 </p>
 
 <QuickGrid Class="table" Items="context.Student">
-    <PropertyColumn Property="student => student.FirstName" />
-    <PropertyColumn Property="student => student.LastName" />
+    <PropertyColumn Property='student => student.FirstName + " " + student.LastName' Title="Student Name" />
     <PropertyColumn Property="student => student.Level" />
-    <PropertyColumn Property="student => student.House.HouseName" />
-    <PropertyColumn Property="student => student.WandId" />
+    <PropertyColumn Property="student => student.House.HouseName" Title="House Name"/>
+    <PropertyColumn Property="student => student.PetNames" Title="Student's Pets" />
+
 
     <TemplateColumn Context="student">
         <a href="@($"students/edit?studentid={student.StudentId}")">Edit</a> |
@@ -35,6 +35,10 @@
     {
         context = DbFactory.CreateDbContext();
         context.House.ToList();
+        context.Pet.ToList();
+        /*context.Course.ToList();
+         * <PropertyColumn Property="student => student.CourseNames" Title="Student's Courses" />
+         */
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

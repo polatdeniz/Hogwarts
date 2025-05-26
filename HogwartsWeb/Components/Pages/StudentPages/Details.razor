@@ -8,35 +8,67 @@
 
 <h1>Details</h1>
 
-<div>
-    <h2>Student</h2>
-    <hr />
-    @if (student is null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else {
-        <dl class="row">
-            <dt class="col-sm-2">FirstName</dt>
-            <dd class="col-sm-10">@student.FirstName</dd>
-            <dt class="col-sm-2">LastName</dt>
-            <dd class="col-sm-10">@student.LastName</dd>
-            <dt class="col-sm-2">Level</dt>
-            <dd class="col-sm-10">@student.Level</dd>
-            <dt class="col-sm-2">HouseId</dt>
-            <dd class="col-sm-10">@student.HouseId</dd>
-            <dt class="col-sm-2">WandId</dt>
-            <dd class="col-sm-10">@student.WandId</dd>
-        </dl>
-        <div>
-            <a href="@($"/students/edit?studentid={student.StudentId}")">Edit</a> |
-            <a href="@($"/students")">Back to List</a>
+@if (student is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <!-- Öğrenci Bilgileri -->
+        <div class="col-md-6">
+            <h2>Student</h2>
+            <dl class="row">
+                <dt class="col-sm-2">FirstName</dt>
+                <dd class="col-sm-10">@student.FirstName</dd>
+                <dt class="col-sm-2">LastName</dt>
+                <dd class="col-sm-10">@student.LastName</dd>
+                <dt class="col-sm-2">Level</dt>
+                <dd class="col-sm-10">@student.Level</dd>
+                <dt class="col-sm-2">HouseId</dt>
+                <dd class="col-sm-10">@student.HouseId</dd>
+                <dt class="col-sm-2">WandId</dt>
+                <dd class="col-sm-10">@student.WandId</dd>
+            </dl>
         </div>
-    }
-</div>
+
+        <!-- Wand Bilgileri ve Maintenance Butonu -->
+        <div class="col-md-6">
+            <h2>Wand Details</h2>
+            <dl class="row">
+                <dt class="col-sm-4">Core</dt>
+                <dd class="col-sm-8">@student.Wand.Core</dd>
+                <dt class="col-sm-4">Material</dt>
+                <dd class="col-sm-8">@student.Wand.Material</dd>
+                <dt class="col-sm-4">Creation Date</dt>
+                <dd class="col-sm-8">@student.Wand.CreationDate.ToString("yyyy-MM-dd")</dd>
+                <dt class="col-sm-4">Last Maintenance</dt>
+                <dd class="col-sm-8">@student.Wand.LastMaintenanceDate</dd>
+            </dl>
+
+            @* Son bakım tarihi 1 yıldan eskiyse göster *@
+            @if (student.Wand.LastMaintenanceDate < DateTime.Now.AddYears(-1))
+            {
+                <button class="btn btn-warning mb-2"
+                        @onclick="async () => await PerformMaintenance()">
+                    Maintenance
+                </button>
+            }
+
+            <p class="text-info">@statusMessage</p>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a class="btn btn-secondary"
+           href="@($"/students/edit?studentid={student.StudentId}")">Edit</a>
+        <a class="btn btn-link" href="/students">Back to List</a>
+    </div>
+}
 
 @code {
     private Student? student;
+    private string statusMessage = "";
 
     [SupplyParameterFromQuery]
     private int StudentId { get; set; }
@@ -44,11 +76,44 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        student = await context.Student.FirstOrDefaultAsync(m => m.StudentId == StudentId);
+        student = await context.Student
+                               .Include(s => s.Wand)
+                               .FirstOrDefaultAsync(s => s.StudentId == StudentId);
 
         if (student is null)
         {
             NavigationManager.NavigateTo("notfound");
         }
+    }
+
+    private async Task PerformMaintenance()
+    {
+        statusMessage = "⏳ Bakım işleniyor…";
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            var wand = await context.Wand
+                                   .FirstOrDefaultAsync(w => w.WandId == student!.Wand.WandId);
+
+            if (wand == null)
+            {
+                statusMessage = "⚠ Wand bulunamadı!";
+            }
+            else
+            {
+                wand.LastMaintenanceDate = DateTime.Now;
+                await context.SaveChangesAsync();
+
+                // Aynı student nesnesine de yansıt
+                student!.Wand.LastMaintenanceDate = wand.LastMaintenanceDate;
+                statusMessage = "✅ Son bakım güncellendi.";
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = "❌ Hata: " + ex.Message;
+        }
+
+        StateHasChanged();
     }
 }

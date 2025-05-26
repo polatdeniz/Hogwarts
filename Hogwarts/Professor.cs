@@ -11,7 +11,8 @@ namespace Hogwarts
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.Linq;
+
     public partial class Professor
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -28,7 +29,8 @@ namespace Hogwarts
         public string Specialty { get; set; }
         public int Level { get; set; }
         public Nullable<int> HouseId { get; set; }
-    
+        public string PetNames => Pets != null && Pets.Any() ? string.Join(", ", Pets.Select(p => p.PetName)) : "(Pet yok)";
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Course> Courses { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

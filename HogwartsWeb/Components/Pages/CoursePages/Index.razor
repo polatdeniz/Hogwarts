@@ -17,8 +17,7 @@
 <QuickGrid Class="table" Items="context.Course">
     <PropertyColumn Property="course => course.CourseName" />
     <PropertyColumn Property="course => course.Description" />
-    <PropertyColumn Property="course => course.Professor.FirstName" Title="Professor Name" />
-    <PropertyColumn Property="course => course.Professor.LastName" Title="Professor Surname" />
+    <PropertyColumn Property='course => course.Professor.FirstName + " " + course.Professor.LastName' Title="Professor Name" />
 
     <TemplateColumn Context="course">
         <a href="@($"courses/edit?courseid={course.CourseId}")">Edit</a> |

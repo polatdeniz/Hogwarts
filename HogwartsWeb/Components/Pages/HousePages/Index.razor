@@ -1,0 +1,39 @@
+﻿@page "/houses"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Hogwarts
+@using HogwartsWeb.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="houses/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.House">
+    <PropertyColumn Property="house => house.HouseName" />
+    <PropertyColumn Property="house => house.Founder" />
+    <PropertyColumn Property="house => house.Symbol" />
+    <PropertyColumn Property="house => house.Colors" />
+
+    <TemplateColumn Context="house">
+        <a href="@($"houses/edit?houseid={house.HouseId}")">Edit</a> |
+        <a href="@($"houses/details?houseid={house.HouseId}")">Details</a> |
+        <a href="@($"houses/delete?houseid={house.HouseId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private HogwartsWebContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

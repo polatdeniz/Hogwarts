@@ -1,0 +1,87 @@
+﻿@page "/professors/create"
+@using Microsoft.EntityFrameworkCore
+@using Hogwarts
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Professor</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Professor" OnValidSubmit="AddProfessor" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="firstname" class="form-label">FirstName:</label> 
+                <InputText id="firstname" @bind-Value="Professor.FirstName" class="form-control" /> 
+                <ValidationMessage For="() => Professor.FirstName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lastname" class="form-label">LastName:</label> 
+                <InputText id="lastname" @bind-Value="Professor.LastName" class="form-control" /> 
+                <ValidationMessage For="() => Professor.LastName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="specialty" class="form-label">Specialty:</label> 
+                <InputText id="specialty" @bind-Value="Professor.Specialty" class="form-control" /> 
+                <ValidationMessage For="() => Professor.Specialty" class="text-danger" /> 
+            </div>        
+                  
+            <div class="mb-3">
+                <label for="houseid" class="form-label">HouseId:</label>
+                <InputSelect id="house"
+                             @bind-Value="Professor.HouseId"
+                             class="form-control">
+                    <option value="">-- Select a House --</option>
+                    @foreach (var house in Houses)
+                    {
+                        <option value="@house.HouseId">@house.HouseName</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Professor.HouseId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/professors">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Professor Professor { get; set; } = new()
+    {
+        Level = 1
+    };
+    private List<House> Houses { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddProfessor()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Professor.Add(Professor);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/professors");
+    }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Houses = await context.House
+                                 .OrderBy(p => p.HouseName)
+                                 .ToListAsync();
+
+        if (Professor is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

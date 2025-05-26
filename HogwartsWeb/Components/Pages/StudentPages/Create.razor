@@ -24,12 +24,7 @@
                 <label for="lastname" class="form-label">LastName:</label> 
                 <InputText id="lastname" @bind-Value="Student.LastName" class="form-control" /> 
                 <ValidationMessage For="() => Student.LastName" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="level" class="form-label">Level:</label> 
-                <InputNumber id="level" @bind-Value="Student.Level" class="form-control" /> 
-                <ValidationMessage For="() => Student.Level" class="text-danger" /> 
-            </div>        
+            </div>              
             <div class="mb-3">
                 <label for="houseid" class="form-label">HouseId:</label> 
                 <InputNumber id="houseid" @bind-Value="Student.HouseId" class="form-control" /> 
@@ -51,7 +46,10 @@
 
 @code {
     [SupplyParameterFromForm]
-    private Student Student { get; set; } = new();
+    private Student Student { get; set; } = new()
+    {
+        Level = 1
+    };
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddStudent()

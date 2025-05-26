@@ -1,0 +1,99 @@
+﻿@page "/spells/edit"
+@using Microsoft.EntityFrameworkCore
+@using Hogwarts
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Spell</h2>
+<hr />
+@if (Spell is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Spell" OnValidSubmit="UpdateSpell" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Spell.SpellId" value="@Spell.SpellId" />
+                <div class="mb-3">
+                    <label for="spellname" class="form-label">SpellName:</label>
+                    <InputText id="spellname" @bind-Value="Spell.SpellName" class="form-control" />
+                    <ValidationMessage For="() => Spell.SpellName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="effect" class="form-label">Effect:</label>
+                    <InputText id="effect" @bind-Value="Spell.Effect" class="form-control" />
+                    <ValidationMessage For="() => Spell.Effect" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="requiredlevel" class="form-label">RequiredLevel:</label>
+                    <InputNumber id="requiredlevel" @bind-Value="Spell.RequiredLevel" class="form-control" />
+                    <ValidationMessage For="() => Spell.RequiredLevel" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/spells">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int SpellId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Spell? Spell { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Spell ??= await context.Spell.FirstOrDefaultAsync(m => m.SpellId == SpellId);
+
+        if (Spell is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateSpell()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Spell!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!SpellExists(Spell!.SpellId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/spells");
+    }
+
+    private bool SpellExists(int spellid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Spell.Any(e => e.SpellId == spellid);
+    }
+}

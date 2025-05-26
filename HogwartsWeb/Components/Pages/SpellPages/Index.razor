@@ -1,0 +1,38 @@
+﻿@page "/spells"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Hogwarts
+@using HogwartsWeb.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="spells/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Spell">
+    <PropertyColumn Property="spell => spell.SpellName" Title="Spell Name"/>
+    <PropertyColumn Property="spell => spell.Effect" />
+    <PropertyColumn Property="spell => spell.RequiredLevel" Title="Required Level"/>
+
+    <TemplateColumn Context="spell">
+        <a href="@($"spells/edit?spellid={spell.SpellId}")">Edit</a> |
+        <a href="@($"spells/details?spellid={spell.SpellId}")">Details</a> |
+        <a href="@($"spells/delete?spellid={spell.SpellId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private HogwartsWebContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

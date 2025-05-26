@@ -1,0 +1,104 @@
+﻿@page "/houses/edit"
+@using Microsoft.EntityFrameworkCore
+@using Hogwarts
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>House</h2>
+<hr />
+@if (House is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="House" OnValidSubmit="UpdateHouse" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="House.HouseId" value="@House.HouseId" />
+                <div class="mb-3">
+                    <label for="housename" class="form-label">HouseName:</label>
+                    <InputText id="housename" @bind-Value="House.HouseName" class="form-control" />
+                    <ValidationMessage For="() => House.HouseName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="founder" class="form-label">Founder:</label>
+                    <InputText id="founder" @bind-Value="House.Founder" class="form-control" />
+                    <ValidationMessage For="() => House.Founder" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="symbol" class="form-label">Symbol:</label>
+                    <InputText id="symbol" @bind-Value="House.Symbol" class="form-control" />
+                    <ValidationMessage For="() => House.Symbol" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="colors" class="form-label">Colors:</label>
+                    <InputText id="colors" @bind-Value="House.Colors" class="form-control" />
+                    <ValidationMessage For="() => House.Colors" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/houses">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int HouseId { get; set; }
+
+    [SupplyParameterFromForm]
+    private House? House { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        House ??= await context.House.FirstOrDefaultAsync(m => m.HouseId == HouseId);
+
+        if (House is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateHouse()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(House!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!HouseExists(House!.HouseId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/houses");
+    }
+
+    private bool HouseExists(int houseid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.House.Any(e => e.HouseId == houseid);
+    }
+}

@@ -23,8 +23,6 @@ namespace Hogwarts
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();
-            modelBuilder.Entity<WandMaintenanceAlert>()
-            .HasKey(e => e.AlertId);
         }
     
         public virtual DbSet<Course> Courses { get; set; }

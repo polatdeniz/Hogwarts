@@ -1,0 +1,40 @@
+﻿@page "/enrollments"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Hogwarts
+@using HogwartsWeb.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="enrollments/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Enrollment">
+    <PropertyColumn Property="enrollment => enrollment.StudentId" />
+    <PropertyColumn Property="enrollment => enrollment.Course.CourseName" />
+    <PropertyColumn Property="enrollment => enrollment.ProfessorId" />
+    <PropertyColumn Property="enrollment => enrollment.EnrollmentDate" />
+
+    <TemplateColumn Context="enrollment">
+        <a href="@($"enrollments/edit?enrollmentid={enrollment.EnrollmentId}")">Edit</a> |
+        <a href="@($"enrollments/details?enrollmentid={enrollment.EnrollmentId}")">Details</a> |
+        <a href="@($"enrollments/delete?enrollmentid={enrollment.EnrollmentId}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private HogwartsWebContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+        context.Course.ToList();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

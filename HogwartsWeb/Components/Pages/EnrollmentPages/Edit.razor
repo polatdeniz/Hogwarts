@@ -1,0 +1,104 @@
+﻿@page "/enrollments/edit"
+@using Microsoft.EntityFrameworkCore
+@using Hogwarts
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Enrollment</h2>
+<hr />
+@if (Enrollment is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Enrollment" OnValidSubmit="UpdateEnrollment" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Enrollment.EnrollmentId" value="@Enrollment.EnrollmentId" />
+                <div class="mb-3">
+                    <label for="studentid" class="form-label">StudentId:</label>
+                    <InputNumber id="studentid" @bind-Value="Enrollment.StudentId" class="form-control" />
+                    <ValidationMessage For="() => Enrollment.StudentId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="courseid" class="form-label">CourseId:</label>
+                    <InputNumber id="courseid" @bind-Value="Enrollment.CourseId" class="form-control" />
+                    <ValidationMessage For="() => Enrollment.CourseId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="professorid" class="form-label">ProfessorId:</label>
+                    <InputNumber id="professorid" @bind-Value="Enrollment.ProfessorId" class="form-control" />
+                    <ValidationMessage For="() => Enrollment.ProfessorId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="enrollmentdate" class="form-label">EnrollmentDate:</label>
+                    <InputDate id="enrollmentdate" @bind-Value="Enrollment.EnrollmentDate" class="form-control" />
+                    <ValidationMessage For="() => Enrollment.EnrollmentDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/enrollments">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int EnrollmentId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Enrollment? Enrollment { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Enrollment ??= await context.Enrollment.FirstOrDefaultAsync(m => m.EnrollmentId == EnrollmentId);
+
+        if (Enrollment is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateEnrollment()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Enrollment!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EnrollmentExists(Enrollment!.EnrollmentId))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/enrollments");
+    }
+
+    private bool EnrollmentExists(int enrollmentid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Enrollment.Any(e => e.EnrollmentId == enrollmentid);
+    }
+}
