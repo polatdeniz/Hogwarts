@@ -6,9 +6,8 @@
 
 <PageTitle>Create</PageTitle>
 
-<h1>Create</h1>
+<h1>Create Spell</h1>
 
-<h2>Spell</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,7 +15,7 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="spellname" class="form-label">SpellName:</label> 
+                <label for="spellname" class="form-label">Spell Name:</label> 
                 <InputText id="spellname" @bind-Value="Spell.SpellName" class="form-control" /> 
                 <ValidationMessage For="() => Spell.SpellName" class="text-danger" /> 
             </div>        
@@ -26,7 +25,7 @@
                 <ValidationMessage For="() => Spell.Effect" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="requiredlevel" class="form-label">RequiredLevel:</label> 
+                <label for="requiredlevel" class="form-label">Required Level:</label> 
                 <InputNumber id="requiredlevel" @bind-Value="Spell.RequiredLevel" class="form-control" /> 
                 <ValidationMessage For="() => Spell.RequiredLevel" class="text-danger" /> 
             </div>        

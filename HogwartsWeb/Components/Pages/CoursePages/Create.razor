@@ -6,9 +6,8 @@
 
 <PageTitle>Create</PageTitle>
 
-<h1>Create</h1>
+<h1>Create Course</h1>
 
-<h2>Course</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,7 +15,7 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="coursename" class="form-label">CourseName:</label> 
+                <label for="coursename" class="form-label">Course Name:</label> 
                 <InputText id="coursename" @bind-Value="Course.CourseName" class="form-control" /> 
                 <ValidationMessage For="() => Course.CourseName" class="text-danger" /> 
             </div>        
@@ -26,7 +25,7 @@
                 <ValidationMessage For="() => Course.Description" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="professorid" class="form-label">ProfessorId:</label> 
+                <label for="professorid" class="form-label">Professor:</label> 
                 <InputSelect id="professor"
                              @bind-Value="Course.ProfessorId"
                              class="form-control">

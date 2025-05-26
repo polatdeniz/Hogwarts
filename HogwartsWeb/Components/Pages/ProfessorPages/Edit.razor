@@ -6,9 +6,8 @@
 
 <PageTitle>Edit</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Professor</h1>
 
-<h2>Professor</h2>
 <hr />
 @if (Professor is null)
 {
@@ -23,12 +22,12 @@ else
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="Professor.ProfessorId" value="@Professor.ProfessorId" />
                 <div class="mb-3">
-                    <label for="firstname" class="form-label">FirstName:</label>
+                    <label for="firstname" class="form-label">First Name:</label>
                     <InputText id="firstname" @bind-Value="Professor.FirstName" class="form-control" />
                     <ValidationMessage For="() => Professor.FirstName" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="lastname" class="form-label">LastName:</label>
+                    <label for="lastname" class="form-label">Last Name:</label>
                     <InputText id="lastname" @bind-Value="Professor.LastName" class="form-control" />
                     <ValidationMessage For="() => Professor.LastName" class="text-danger" />
                 </div>

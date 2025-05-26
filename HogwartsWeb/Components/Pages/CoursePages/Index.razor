@@ -8,14 +8,14 @@
 
 <PageTitle>Courses</PageTitle>
 
-<h1>Courses</h1>
+<h1>Course</h1>
 
 <p>
     <a href="courses/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Course">
-    <PropertyColumn Property="course => course.CourseName" />
+    <PropertyColumn Property="course => course.CourseName" Title="Course Name"/>
     <PropertyColumn Property="course => course.Description" />
     <PropertyColumn Property='course => course.Professor.FirstName + " " + course.Professor.LastName' Title="Professor Name" />
 

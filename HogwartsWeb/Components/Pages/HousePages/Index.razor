@@ -6,16 +6,16 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Houses</PageTitle>
 
-<h1>Index</h1>
+<h1>House</h1>
 
 <p>
     <a href="houses/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="context.House">
-    <PropertyColumn Property="house => house.HouseName" />
+    <PropertyColumn Property="house => house.HouseName" Title="House Name"/>
     <PropertyColumn Property="house => house.Founder" />
     <PropertyColumn Property="house => house.Symbol" />
     <PropertyColumn Property="house => house.Colors" />

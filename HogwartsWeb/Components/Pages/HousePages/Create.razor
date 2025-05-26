@@ -6,9 +6,8 @@
 
 <PageTitle>Create</PageTitle>
 
-<h1>Create</h1>
+<h1>Create House</h1>
 
-<h2>House</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,7 +15,7 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="housename" class="form-label">HouseName:</label> 
+                <label for="housename" class="form-label">House Name:</label> 
                 <InputText id="housename" @bind-Value="House.HouseName" class="form-control" /> 
                 <ValidationMessage For="() => House.HouseName" class="text-danger" /> 
             </div>        

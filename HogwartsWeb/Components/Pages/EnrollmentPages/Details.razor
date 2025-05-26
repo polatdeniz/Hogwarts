@@ -6,10 +6,9 @@
 
 <PageTitle>Details</PageTitle>
 
-<h1>Details</h1>
+<h1>Enrollment Details</h1>
 
 <div>
-    <h2>Enrollment</h2>
     <hr />
     @if (enrollment is null)
     {
@@ -17,13 +16,13 @@
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">StudentId</dt>
+            <dt class="col-sm-2">Student Id</dt>
             <dd class="col-sm-10">@enrollment.StudentId</dd>
-            <dt class="col-sm-2">CourseId</dt>
+            <dt class="col-sm-2">Course Id</dt>
             <dd class="col-sm-10">@enrollment.CourseId</dd>
-            <dt class="col-sm-2">ProfessorId</dt>
+            <dt class="col-sm-2">Professor Id</dt>
             <dd class="col-sm-10">@enrollment.ProfessorId</dd>
-            <dt class="col-sm-2">EnrollmentDate</dt>
+            <dt class="col-sm-2">Enrollment Date</dt>
             <dd class="col-sm-10">@enrollment.EnrollmentDate</dd>
         </dl>
         <div>

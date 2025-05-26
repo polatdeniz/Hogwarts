@@ -23,7 +23,7 @@ else
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="House.HouseId" value="@House.HouseId" />
                 <div class="mb-3">
-                    <label for="housename" class="form-label">HouseName:</label>
+                    <label for="housename" class="form-label">House Name:</label>
                     <InputText id="housename" @bind-Value="House.HouseName" class="form-control" />
                     <ValidationMessage For="() => House.HouseName" class="text-danger" />
                 </div>

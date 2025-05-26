@@ -6,9 +6,8 @@
 
 <PageTitle>Edit</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Enrollment</h1>
 
-<h2>Enrollment</h2>
 <hr />
 @if (Enrollment is null)
 {
@@ -23,22 +22,22 @@ else
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="Enrollment.EnrollmentId" value="@Enrollment.EnrollmentId" />
                 <div class="mb-3">
-                    <label for="studentid" class="form-label">StudentId:</label>
+                    <label for="studentid" class="form-label">Student Id:</label>
                     <InputNumber id="studentid" @bind-Value="Enrollment.StudentId" class="form-control" />
                     <ValidationMessage For="() => Enrollment.StudentId" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="courseid" class="form-label">CourseId:</label>
+                    <label for="courseid" class="form-label">Course Id:</label>
                     <InputNumber id="courseid" @bind-Value="Enrollment.CourseId" class="form-control" />
                     <ValidationMessage For="() => Enrollment.CourseId" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="professorid" class="form-label">ProfessorId:</label>
+                    <label for="professorid" class="form-label">Professor Id:</label>
                     <InputNumber id="professorid" @bind-Value="Enrollment.ProfessorId" class="form-control" />
                     <ValidationMessage For="() => Enrollment.ProfessorId" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="enrollmentdate" class="form-label">EnrollmentDate:</label>
+                    <label for="enrollmentdate" class="form-label">Enrollment Date:</label>
                     <InputDate id="enrollmentdate" @bind-Value="Enrollment.EnrollmentDate" class="form-control" />
                     <ValidationMessage For="() => Enrollment.EnrollmentDate" class="text-danger" />
                 </div>

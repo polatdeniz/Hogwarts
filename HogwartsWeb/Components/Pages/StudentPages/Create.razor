@@ -6,9 +6,8 @@
 
 <PageTitle>Create</PageTitle>
 
-<h1>Create</h1>
+<h1>Create Student</h1>
 
-<h2>Student</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,25 +15,29 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="firstname" class="form-label">FirstName:</label> 
+                <label for="firstname" class="form-label">First Name:</label> 
                 <InputText id="firstname" @bind-Value="Student.FirstName" class="form-control" /> 
                 <ValidationMessage For="() => Student.FirstName" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="lastname" class="form-label">LastName:</label> 
+                <label for="lastname" class="form-label">Last Name:</label> 
                 <InputText id="lastname" @bind-Value="Student.LastName" class="form-control" /> 
                 <ValidationMessage For="() => Student.LastName" class="text-danger" /> 
             </div>              
             <div class="mb-3">
-                <label for="houseid" class="form-label">HouseId:</label> 
-                <InputNumber id="houseid" @bind-Value="Student.HouseId" class="form-control" /> 
+                <label for="houseid" class="form-label">House:</label>
+                <InputSelect id="house"
+                             @bind-Value="Student.HouseId"
+                             class="form-control">
+                    <option value="">-- Select a House --</option>
+                    @foreach (var house in Houses)
+                    {
+                        <option value="@house.HouseId">@house.HouseName</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => Student.HouseId" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
-                <label for="wandid" class="form-label">WandId:</label> 
-                <InputNumber id="wandid" @bind-Value="Student.WandId" class="form-control" /> 
-                <ValidationMessage For="() => Student.WandId" class="text-danger" /> 
-            </div>        
+                   
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -50,13 +53,39 @@
     {
         Level = 1
     };
+    private List<House> Houses { get; set; } = new();
+    private List<Wand> Wands { get; set; } = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        Houses = await context.House
+                                  .OrderBy(p => p.HouseName)
+                                  .ToListAsync();
+
+        Wands = await context.Wand
+    .OrderBy(w => w.WandId)
+    .ToListAsync();
+    }
+
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddStudent()
     {
+        // Rastgele wand ataması
+        var rnd = new Random();
+        var pick = Wands[rnd.Next(Wands.Count)];
+        Student.WandId = pick.WandId;
+
+        // Burada Level’ı garantiye al:
+        Student.Level = 1;
+
         using var context = DbFactory.CreateDbContext();
         context.Student.Add(Student);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/students");
     }
+
 }

@@ -23,5 +23,13 @@ namespace HogwartsWeb.Data
         public DbSet<Hogwarts.Student> Student { get; set; } = default!;
         public DbSet<Hogwarts.Wand> Wand { get; set; } = default!;
         public DbSet<Hogwarts.WandMaintenanceAlert> WandMaintenanceAlert { get; set; } = default!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Wand>()
+                        .ToTable(tb => tb.HasTrigger("Trigger_Wand_Update"));
+        }
     }
 }

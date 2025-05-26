@@ -6,9 +6,8 @@
 
 <PageTitle>Edit</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Course</h1>
 
-<h2>Course</h2>
 <hr />
 @if (Course is null)
 {
@@ -23,7 +22,7 @@ else
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="Course.CourseId" value="@Course.CourseId" />
                 <div class="mb-3">
-                    <label for="coursename" class="form-label">CourseName:</label>
+                    <label for="coursename" class="form-label">Course Name:</label>
                     <InputText id="coursename" @bind-Value="Course.CourseName" class="form-control" />
                     <ValidationMessage For="() => Course.CourseName" class="text-danger" />
                 </div>
@@ -33,8 +32,16 @@ else
                     <ValidationMessage For="() => Course.Description" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="professorid" class="form-label">ProfessorId:</label>
-                    <InputNumber id="professorid" @bind-Value="Course.ProfessorId" class="form-control" />
+                    <label for="professorid" class="form-label">Professor</label>
+                    <InputSelect id="professor"
+                                 @bind-Value="Course.ProfessorId"
+                                 class="form-control">
+                        <option value="">-- Select a Professor --</option>
+                        @foreach (var prof in Professors)
+                        {
+                            <option value="@prof.ProfessorId">@prof.FirstName</option>
+                        }
+                    </InputSelect>
                     <ValidationMessage For="() => Course.ProfessorId" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -54,10 +61,17 @@ else
     [SupplyParameterFromForm]
     private Course? Course { get; set; }
 
+    private List<Professor> Professors { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
+        
         using var context = DbFactory.CreateDbContext();
         Course ??= await context.Course.FirstOrDefaultAsync(m => m.CourseId == CourseId);
+
+        Professors = await context.Professor
+                                 .OrderBy(p => p.FirstName)
+                                 .ToListAsync();
 
         if (Course is null)
         {

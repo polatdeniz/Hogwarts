@@ -6,10 +6,9 @@
 
 <PageTitle>Details</PageTitle>
 
-<h1>Details</h1>
+<h1>House Details</h1>
 
 <div>
-    <h2>House</h2>
     <hr />
     @if (house is null)
     {
@@ -17,7 +16,7 @@
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">HouseName</dt>
+            <dt class="col-sm-2">House Name</dt>
             <dd class="col-sm-10">@house.HouseName</dd>
             <dt class="col-sm-2">Founder</dt>
             <dd class="col-sm-10">@house.Founder</dd>
@@ -25,7 +24,39 @@
             <dd class="col-sm-10">@house.Symbol</dd>
             <dt class="col-sm-2">Colors</dt>
             <dd class="col-sm-10">@house.Colors</dd>
+            <dt class="col-sm-2">Professors</dt>
         </dl>
+
+        <h3>Professors</h3>
+    @if (house.Professors.Any())
+    {
+        <ul>
+            @foreach (var prof in house.Professors)
+            {
+                <li>@prof.FirstName @prof.LastName</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p><em>No professors assigned to this house.</em></p>
+    }
+
+    <h3>Students</h3>
+    @if (house.Students.Any())
+    {
+        <ul>
+            @foreach (var student in house.Students)
+            {
+                <li>@student.FirstName @student.LastName</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p><em>No students assigned to this house.</em></p>
+    }
+
         <div>
             <a href="@($"/houses/edit?houseid={house.HouseId}")">Edit</a> |
             <a href="@($"/houses")">Back to List</a>
@@ -42,7 +73,10 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        house = await context.House.FirstOrDefaultAsync(m => m.HouseId == HouseId);
+        house = await context.House
+        .Include(h => h.Professors)
+        .Include(h => h.Students)
+        .FirstOrDefaultAsync(m => m.HouseId == HouseId);
 
         if (house is null)
         {

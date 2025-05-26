@@ -6,9 +6,8 @@
 
 <PageTitle>Create</PageTitle>
 
-<h1>Create</h1>
+<h1>Create Professor</h1>
 
-<h2>Professor</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,12 +15,12 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
-                <label for="firstname" class="form-label">FirstName:</label> 
+                <label for="firstname" class="form-label">First Name:</label> 
                 <InputText id="firstname" @bind-Value="Professor.FirstName" class="form-control" /> 
                 <ValidationMessage For="() => Professor.FirstName" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="lastname" class="form-label">LastName:</label> 
+                <label for="lastname" class="form-label">Last Name:</label> 
                 <InputText id="lastname" @bind-Value="Professor.LastName" class="form-control" /> 
                 <ValidationMessage For="() => Professor.LastName" class="text-danger" /> 
             </div>        
@@ -32,7 +31,7 @@
             </div>        
                   
             <div class="mb-3">
-                <label for="houseid" class="form-label">HouseId:</label>
+                <label for="houseid" class="form-label">House:</label>
                 <InputSelect id="house"
                              @bind-Value="Professor.HouseId"
                              class="form-control">
@@ -55,22 +54,20 @@
 
 @code {
     [SupplyParameterFromForm]
-    private Professor Professor { get; set; } = new()
-    {
-        Level = 1
-    };
+    private Professor Professor { get; set; } = new();
     private List<House> Houses { get; set; } = new();
+    private static readonly Random _random = new Random();
+
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddProfessor()
     {
         using var context = DbFactory.CreateDbContext();
+        Professor.Level = _random.Next(7, 11);
         context.Professor.Add(Professor);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/professors");
     }
-
-
 
     protected override async Task OnInitializedAsync()
     {

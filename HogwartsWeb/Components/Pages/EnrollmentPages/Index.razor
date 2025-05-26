@@ -6,19 +6,19 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Enrollments</PageTitle>
 
-<h1>Index</h1>
+<h1>Enrollment</h1>
 
 <p>
     <a href="enrollments/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Enrollment">
-    <PropertyColumn Property="enrollment => enrollment.StudentId" />
-    <PropertyColumn Property="enrollment => enrollment.Course.CourseName" />
-    <PropertyColumn Property="enrollment => enrollment.ProfessorId" />
-    <PropertyColumn Property="enrollment => enrollment.EnrollmentDate" />
+    <PropertyColumn Property='enrollment => enrollment.Student.FirstName + " " + enrollment.Student.LastName' Title="Student" />
+    <PropertyColumn Property="enrollment => enrollment.Course.CourseName" Title="Course" />
+    <PropertyColumn Property='enrollment => enrollment.Professor.FirstName + " " + enrollment.Professor.LastName' Title="Professor" />
+    <PropertyColumn Property="enrollment => enrollment.EnrollmentDate" Title="Enrollment Date" />
 
     <TemplateColumn Context="enrollment">
         <a href="@($"enrollments/edit?enrollmentid={enrollment.EnrollmentId}")">Edit</a> |
@@ -34,6 +34,8 @@
     {
         context = DbFactory.CreateDbContext();
         context.Course.ToList();
+        context.Student.ToList();
+        context.Professor.ToList();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

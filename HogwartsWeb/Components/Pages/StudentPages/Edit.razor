@@ -6,9 +6,8 @@
 
 <PageTitle>Edit</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Student</h1>
 
-<h2>Student</h2>
 <hr />
 @if (Student is null)
 {
@@ -23,12 +22,12 @@ else
                 <ValidationSummary role="alert"/>
                 <input type="hidden" name="Student.StudentId" value="@Student.StudentId" />
                 <div class="mb-3">
-                    <label for="firstname" class="form-label">FirstName:</label>
+                    <label for="firstname" class="form-label">First Name:</label>
                     <InputText id="firstname" @bind-Value="Student.FirstName" class="form-control" />
                     <ValidationMessage For="() => Student.FirstName" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="lastname" class="form-label">LastName:</label>
+                    <label for="lastname" class="form-label">Last Name:</label>
                     <InputText id="lastname" @bind-Value="Student.LastName" class="form-control" />
                     <ValidationMessage For="() => Student.LastName" class="text-danger" />
                 </div>
@@ -38,15 +37,19 @@ else
                     <ValidationMessage For="() => Student.Level" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="houseid" class="form-label">HouseId:</label>
-                    <InputNumber id="houseid" @bind-Value="Student.HouseId" class="form-control" />
+                    <label for="houseid" class="form-label">House:</label>
+                    <InputSelect id="house"
+                                 @bind-Value="Student.HouseId"
+                                 class="form-control">
+                        <option value="">-- Select a House --</option>
+                        @foreach (var house in Houses)
+                        {
+                            <option value="@house.HouseId">@house.HouseName</option>
+                        }
+                    </InputSelect>
                     <ValidationMessage For="() => Student.HouseId" class="text-danger" />
                 </div>
-                <div class="mb-3">
-                    <label for="wandid" class="form-label">WandId:</label>
-                    <InputNumber id="wandid" @bind-Value="Student.WandId" class="form-control" />
-                    <ValidationMessage For="() => Student.WandId" class="text-danger" />
-                </div>
+               
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>
@@ -63,11 +66,16 @@ else
 
     [SupplyParameterFromForm]
     private Student? Student { get; set; }
+    private List<House> Houses { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
         Student ??= await context.Student.FirstOrDefaultAsync(m => m.StudentId == StudentId);
+        
+        Houses = await context.House
+                                 .OrderBy(p => p.HouseName)
+                                 .ToListAsync();
 
         if (Student is null)
         {
