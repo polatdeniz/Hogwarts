@@ -1,7 +1,134 @@
 ﻿@page "/"
 
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using AbdHogwarts
+@using HogwartsWeb.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+
+
+<style>
+    body {
+        background-image: url("images/Hogwarts.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+    }
+
+    .glass-card {
+        background-color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(5px);
+        border-radius: 15px;
+        color: #222;
+    }
+
+    .glass-card-dark {
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        border-radius: 15px;
+        color: #fff;
+    }
+
+    .home-title {
+        color: white;
+        text-shadow: 2px 2px 4px #000;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .card-img-top {
+        max-height: 160px;
+        object-fit: contain;
+    }
+
+    .btn-hogwarts {
+        background-color: #343a40;
+        color: white;
+        border: none;
+    }
+
+        .btn-hogwarts:hover {
+            background-color: #23272b;
+        }
+</style>
+
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1 class="home-title">Welcome to Hogwarts</h1>
 
-Welcome to your new app.
+@if (headmaster != null)
+{
+    <div class="container mb-4">
+        <div class="card glass-card-dark shadow p-3">
+            <div class="row g-0 align-items-center">
+                <div class="col-md-3 text-center">
+                    <img src="images/Dumbledore.webp" class="img-fluid rounded-circle" style="max-height: 150px; width: 150px; object-fit: cover;" alt="Albus Dumbledore">
+                </div>
+                <div class="col-md-9">
+                    <div class="card-body">
+                        <h4 class="card-title">Headmaster: @headmaster.FirstName @headmaster.LastName</h4>
+                        <p class="card-text"><strong>Specialty:</strong> @headmaster.Specialty</p>
+                        <p class="card-text"><strong>Level:</strong> @headmaster.Level</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (houses == null)
+{
+    <p class="text-light"><em>Loading houses...</em></p>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            @foreach (var house in houses)
+            {
+                var (bgColor, textColor, logoUrl) = GetHouseTheme(house.HouseName);
+
+                <div class="col-md-6 col-lg-3 d-flex">
+                    <div class="card m-2 glass-card shadow flex-fill" style="border-top: 5px solid @bgColor;">
+                        <img src="@logoUrl" class="card-img-top p-2" />
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@house.HouseName</h5>
+                            <p class="card-text"><strong>Founder:</strong> @house.Founder</p>
+                            <p class="card-text"><strong>Symbol:</strong> @house.Symbol</p>
+                            <a class="btn btn-hogwarts mt-2" href="@($"houses/details?houseid={house.HouseId}")">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private Professor? headmaster;
+    private HogwartsWebContext context = default!;
+    private List<House>? houses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        houses = await context.House.ToListAsync();
+        headmaster = await context.Professor.FirstOrDefaultAsync(p => p.FirstName == "Albus");
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+    private (string bgColor, string textColor, string logoUrl) GetHouseTheme(string houseName)
+    {
+        return houseName.ToLower() switch
+        {
+            "gryffindor" => ("#7F0909", "white", "images/gryffindor.webp"),
+            "hufflepuff" => ("#EEE117", "black", "images/hufflepuff.webp"),
+            "ravenclaw" => ("#222F5B", "white", "images/ravenclaw.webp"),
+            "slytherin" => ("#2A623D", "white", "images/slytherin.webp"),
+            _ => ("#FFFFFF", "black", "")
+        };
+    }
+}

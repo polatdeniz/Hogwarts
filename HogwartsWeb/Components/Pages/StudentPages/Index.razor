@@ -1,32 +1,33 @@
 ﻿@page "/students"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using Hogwarts
+@using AbdHogwarts
 @using HogwartsWeb.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 
-<PageTitle>Student</PageTitle>
+<PageTitle>Students</PageTitle>
 
-<h1>Student</h1>
+<div class="page-container">
+    <h1 class="page-title">Students</h1>
 
-<p>
-    <a href="students/create">Create New</a>
-</p>
+    <p>
+        <a class="btn-create" href="students/create">+ Create New</a>
+    </p>
 
-<QuickGrid Class="table" Items="context.Student">
-    <PropertyColumn Property='student => student.FirstName + " " + student.LastName' Title="Student Name" />
-    <PropertyColumn Property="student => student.Level" />
-    <PropertyColumn Property="student => student.House.HouseName" Title="House Name"/>
-    <PropertyColumn Property="student => student.PetNames" Title="Student's Pets" />
+    <QuickGrid Class="quickgrid-table table" Items="context.Student">
+        <PropertyColumn Property='student => student.FirstName + " " + student.LastName' Title="Student Name" />
+        <PropertyColumn Property="student => student.Level" />
+        <PropertyColumn Property="student => student.House.HouseName" Title="House" />
+        <PropertyColumn Property="student => student.PetNames" Title="Student's Pets" />
 
-
-    <TemplateColumn Context="student">
-        <a href="@($"students/edit?studentid={student.StudentId}")">Edit</a> |
-        <a href="@($"students/details?studentid={student.StudentId}")">Details</a> |
-        <a href="@($"students/delete?studentid={student.StudentId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <TemplateColumn Context="student">
+            <a href="@($"students/edit?studentid={student.StudentId}")">Edit</a> |
+            <a href="@($"students/details?studentid={student.StudentId}")">Details</a> |
+            <a href="@($"students/delete?studentid={student.StudentId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
 
 @code {
     private HogwartsWebContext context = default!;
@@ -34,11 +35,13 @@
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+
+        // Eager load related data for grid display
         context.House.ToList();
         context.Pet.ToList();
-        /*context.Course.ToList();
-         * <PropertyColumn Property="student => student.CourseNames" Title="Student's Courses" />
-         */
+
+        // Eğer öğrenci dersleri de listelenmek istenirse:
+        // context.Course.ToList();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

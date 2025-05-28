@@ -1,30 +1,31 @@
 ﻿@page "/courses"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using Hogwarts
 @using HogwartsWeb.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
+@inject IDbContextFactory<HogwartsWebContext> DbFactory
 
 <PageTitle>Courses</PageTitle>
 
-<h1>Course</h1>
+<div class="page-container">
+    <h1 class="page-title">Courses</h1>
 
-<p>
-    <a href="courses/create">Create New</a>
-</p>
+    <p>
+        <a class="btn-create" href="courses/create">+ Create New</a>
+    </p>
 
-<QuickGrid Class="table" Items="context.Course">
-    <PropertyColumn Property="course => course.CourseName" Title="Course Name"/>
-    <PropertyColumn Property="course => course.Description" />
-    <PropertyColumn Property='course => course.Professor.FirstName + " " + course.Professor.LastName' Title="Professor Name" />
+    <QuickGrid Class="quickgrid-table table" Items="context.Course">
+        <PropertyColumn Property="course => course.CourseName" Title="Course Name" />
+        <PropertyColumn Property="course => course.Description" />
+        <PropertyColumn Property='course => course.Professor.FirstName + " " + course.Professor.LastName' Title="Professor Name" />
 
-    <TemplateColumn Context="course">
-        <a href="@($"courses/edit?courseid={course.CourseId}")">Edit</a> |
-        <a href="@($"courses/details?courseid={course.CourseId}")">Details</a> |
-        <a href="@($"courses/delete?courseid={course.CourseId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <TemplateColumn Context="course">
+            <a href="@($"courses/edit?courseid={course.CourseId}")">Edit</a> |
+            <a href="@($"courses/details?courseid={course.CourseId}")">Details</a> |
+            <a href="@($"courses/delete?courseid={course.CourseId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
 
 @code {
     private HogwartsWebContext context = default!;
@@ -32,7 +33,7 @@
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
-        context.Professor.ToList();
+        context.Professor.ToList(); // eager loading
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

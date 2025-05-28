@@ -1,71 +1,99 @@
 ﻿@page "/houses/details"
 @using Microsoft.EntityFrameworkCore
-@using Hogwarts
+@using AbdHogwarts
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Details</PageTitle>
-
-<h1>House Details</h1>
-
-<div>
-    <hr />
-    @if (house is null)
-    {
-        <p><em>Loading...</em></p>
+<style>
+    .bg-blur {
+        background-color: rgba(255, 255, 255, 0.85); /* Yarı saydam beyaz zemin */
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        max-width: 900px;
+        margin: auto;
     }
-    else {
-        <dl class="row">
-            <dt class="col-sm-2">House Name</dt>
-            <dd class="col-sm-10">@house.HouseName</dd>
-            <dt class="col-sm-2">Founder</dt>
-            <dd class="col-sm-10">@house.Founder</dd>
-            <dt class="col-sm-2">Symbol</dt>
-            <dd class="col-sm-10">@house.Symbol</dd>
-            <dt class="col-sm-2">Colors</dt>
-            <dd class="col-sm-10">@house.Colors</dd>
-            <dt class="col-sm-2">Professors</dt>
-        </dl>
 
-        <h3>Professors</h3>
-    @if (house.Professors.Any())
-    {
-        <ul>
-            @foreach (var prof in house.Professors)
+    /* Metinlerin görünürlüğünü artırmak için */
+    .page-container h1,
+    .page-container h3,
+    .page-container dt,
+    .page-container dd,
+    .page-container li,
+    .page-container p {
+        color: #222; /* Koyu metin */
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+    }
+</style>
+
+
+
+<div class="page-container" style="background-image: url('@BackgroundImageUrl'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    <PageTitle>Details</PageTitle>
+
+    <h1>House Details</h1>
+
+    <div class="bg-blur">
+        <hr />
+        @if (house is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <dl class="row">
+                <dt class="col-sm-2">House Name</dt>
+                <dd class="col-sm-10">@house.HouseName</dd>
+                <dt class="col-sm-2">Founder</dt>
+                <dd class="col-sm-10">@house.Founder</dd>
+                <dt class="col-sm-2">Symbol</dt>
+                <dd class="col-sm-10">@house.Symbol</dd>
+                <dt class="col-sm-2">Colors</dt>
+                <dd class="col-sm-10">@house.Colors</dd>
+                <dt class="col-sm-2">Professors</dt>
+            </dl>
+
+            <h3>Professors</h3>
+            @if (house.Professors.Any())
             {
-                <li>@prof.FirstName @prof.LastName</li>
+                <ul>
+                    @foreach (var prof in house.Professors)
+                    {
+                        <li>@prof.FirstName @prof.LastName</li>
+                    }
+                </ul>
             }
-        </ul>
-    }
-    else
-    {
-        <p><em>No professors assigned to this house.</em></p>
-    }
-
-    <h3>Students</h3>
-    @if (house.Students.Any())
-    {
-        <ul>
-            @foreach (var student in house.Students)
+            else
             {
-                <li>@student.FirstName @student.LastName</li>
+                <p><em>No professors assigned to this house.</em></p>
             }
-        </ul>
-    }
-    else
-    {
-        <p><em>No students assigned to this house.</em></p>
-    }
 
-        <div>
-            <a href="@($"/houses/edit?houseid={house.HouseId}")">Edit</a> |
-            <a href="@($"/houses")">Back to List</a>
-        </div>
-    }
+            <h3>Students</h3>
+            @if (house.Students.Any())
+            {
+                <ul>
+                    @foreach (var student in house.Students)
+                    {
+                        <li>@student.FirstName @student.LastName</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p><em>No students assigned to this house.</em></p>
+            }
+
+            <div>
+                <a href="@($"/houses/edit?houseid={house.HouseId}")">Edit</a> |
+                <a href="@($"/houses")">Back to List</a>
+            </div>
+        }
+    </div>
 </div>
 
 @code {
     private House? house;
+    private string BackgroundImageUrl = "/Images/Default_common_room.jpg";
 
     [SupplyParameterFromQuery]
     private int HouseId { get; set; }
@@ -74,13 +102,28 @@
     {
         using var context = DbFactory.CreateDbContext();
         house = await context.House
-        .Include(h => h.Professors)
-        .Include(h => h.Students)
-        .FirstOrDefaultAsync(m => m.HouseId == HouseId);
+            .Include(h => h.Professors)
+            .Include(h => h.Students)
+            .FirstOrDefaultAsync(m => m.HouseId == HouseId);
 
         if (house is null)
         {
             NavigationManager.NavigateTo("notfound");
+            return;
         }
+
+        SetBackgroundImage();
+    }
+
+    private void SetBackgroundImage()
+    {
+        BackgroundImageUrl = house?.HouseName switch
+        {
+            "Gryffindor" => "/Images/G_common_room.webp",
+            "Hufflepuff" => "/Images/H_common_room.webp",
+            "Ravenclaw" => "/Images/R_common_room.webp",
+            "Slytherin" => "/Images/S_common_room.webp",
+            _ => "/Images/Default_common_room.jpg"
+        };
     }
 }

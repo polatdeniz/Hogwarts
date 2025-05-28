@@ -1,50 +1,54 @@
 ﻿@page "/spells/edit"
 @using Microsoft.EntityFrameworkCore
-@using Hogwarts
+@using AbdHogwarts
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<div class="page-container">
+    <PageTitle>Edit</PageTitle>
 
-<h1>Edit Spell</h1>
+    <h1>Edit Spell</h1>
 
-<hr />
-@if (Spell is null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="Spell" OnValidSubmit="UpdateSpell" FormName="edit" Enhance>
-                <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
-                <input type="hidden" name="Spell.SpellId" value="@Spell.SpellId" />
-                <div class="mb-3">
-                    <label for="spellname" class="form-label">Spell Name:</label>
-                    <InputText id="spellname" @bind-Value="Spell.SpellName" class="form-control" />
-                    <ValidationMessage For="() => Spell.SpellName" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="effect" class="form-label">Effect:</label>
-                    <InputText id="effect" @bind-Value="Spell.Effect" class="form-control" />
-                    <ValidationMessage For="() => Spell.Effect" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="requiredlevel" class="form-label">Required Level:</label>
-                    <InputNumber id="requiredlevel" @bind-Value="Spell.RequiredLevel" class="form-control" />
-                    <ValidationMessage For="() => Spell.RequiredLevel" class="text-danger" />
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </EditForm>
+    <hr />
+    @if (Spell is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <EditForm method="post" Model="Spell" OnValidSubmit="UpdateSpell" FormName="edit" Enhance>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary role="alert" />
+                    <input type="hidden" name="Spell.SpellId" value="@Spell.SpellId" />
+                    <div class="mb-3">
+                        <label for="spellname" class="form-label">Spell Name:</label>
+                        <InputText id="spellname" @bind-Value="Spell.SpellName" class="form-control" />
+                        <ValidationMessage For="() => Spell.SpellName" class="text-danger" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="effect" class="form-label">Effect:</label>
+                        <InputText id="effect" @bind-Value="Spell.Effect" class="form-control" />
+                        <ValidationMessage For="() => Spell.Effect" class="text-danger" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="requiredlevel" class="form-label">Required Level:</label>
+                        <InputNumber id="requiredlevel" @bind-Value="Spell.RequiredLevel" class="form-control" />
+                        <ValidationMessage For="() => Spell.RequiredLevel" class="text-danger" />
+                    </div>
+                    <button type="submit" class="btn-create">Save</button>
+                </EditForm>
+            </div>
         </div>
-    </div>
-}
+    }
 
-<div>
-    <a href="/spells">Back to List</a>
+    <div>
+        <a href="/spells">Back to List</a>
+    </div>
+
 </div>
+
 
 @code {
     [SupplyParameterFromQuery]

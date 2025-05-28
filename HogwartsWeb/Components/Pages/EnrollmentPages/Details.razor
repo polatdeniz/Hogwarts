@@ -1,33 +1,38 @@
 ﻿@page "/enrollments/details"
 @using Microsoft.EntityFrameworkCore
-@using Hogwarts
+@using AbdHogwarts
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Details</PageTitle>
+<PageTitle>Enrollment Details</PageTitle>
 
-<h1>Enrollment Details</h1>
+<div class="page-container">
+    <h1 class="page-title">Enrollment Details</h1>
 
-<div>
     <hr />
     @if (enrollment is null)
     {
         <p><em>Loading...</em></p>
     }
-    else {
+    else
+    {
         <dl class="row">
-            <dt class="col-sm-2">Student Id</dt>
-            <dd class="col-sm-10">@enrollment.StudentId</dd>
-            <dt class="col-sm-2">Course Id</dt>
-            <dd class="col-sm-10">@enrollment.CourseId</dd>
-            <dt class="col-sm-2">Professor Id</dt>
-            <dd class="col-sm-10">@enrollment.ProfessorId</dd>
-            <dt class="col-sm-2">Enrollment Date</dt>
-            <dd class="col-sm-10">@enrollment.EnrollmentDate</dd>
+            <dt class="col-sm-3">Student ID:</dt>
+            <dd class="col-sm-9">@enrollment.StudentId</dd>
+
+            <dt class="col-sm-3">Course ID:</dt>
+            <dd class="col-sm-9">@enrollment.CourseId</dd>
+
+            <dt class="col-sm-3">Professor ID:</dt>
+            <dd class="col-sm-9">@enrollment.ProfessorId</dd>
+
+            <dt class="col-sm-3">Enrollment Date:</dt>
+            <dd class="col-sm-9">@enrollment.EnrollmentDate.ToShortDateString()</dd>
         </dl>
-        <div>
-            <a href="@($"/enrollments/edit?enrollmentid={enrollment.EnrollmentId}")">Edit</a> |
-            <a href="@($"/enrollments")">Back to List</a>
+
+        <div class="mt-3">
+            <a href="@($"/enrollments/edit?enrollmentid={enrollment.EnrollmentId}")" class="btn btn-primary me-2">Edit</a>
+            <a href="/enrollments" class="btn btn-secondary">Back to List</a>
         </div>
     }
 </div>

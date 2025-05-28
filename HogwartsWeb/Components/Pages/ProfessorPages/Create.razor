@@ -1,84 +1,140 @@
 ﻿@page "/professors/create"
 @using Microsoft.EntityFrameworkCore
-@using Hogwarts
+@using AbdHogwarts
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create Professor</PageTitle>
 
-<h1>Create Professor</h1>
+<div class="page-container d-flex justify-content-center align-items-start py-5">
+    <div class="card shadow-lg" style="width: 480px; border-radius: 1rem;">
+        <div class="card-header text-center bg-dark text-white" style="border-top-left-radius:1rem; border-top-right-radius:1rem;">
+            <h2 class="m-0">🧙‍♂️ Create Professor</h2>
+        </div>
+        <div class="card-body bg-light p-4"> 
+            <EditForm Model="Professor" OnValidSubmit="OnCreateProfessor" FormName="createProfessor">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger mb-3" />
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Professor" OnValidSubmit="AddProfessor" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
-            <div class="mb-3">
-                <label for="firstname" class="form-label">First Name:</label> 
-                <InputText id="firstname" @bind-Value="Professor.FirstName" class="form-control" /> 
-                <ValidationMessage For="() => Professor.FirstName" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="lastname" class="form-label">Last Name:</label> 
-                <InputText id="lastname" @bind-Value="Professor.LastName" class="form-control" /> 
-                <ValidationMessage For="() => Professor.LastName" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="specialty" class="form-label">Specialty:</label> 
-                <InputText id="specialty" @bind-Value="Professor.Specialty" class="form-control" /> 
-                <ValidationMessage For="() => Professor.Specialty" class="text-danger" /> 
-            </div>        
-                  
-            <div class="mb-3">
-                <label for="houseid" class="form-label">House:</label>
-                <InputSelect id="house"
-                             @bind-Value="Professor.HouseId"
-                             class="form-control">
-                    <option value="">-- Select a House --</option>
-                    @foreach (var house in Houses)
-                    {
-                        <option value="@house.HouseId">@house.HouseName</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => Professor.HouseId" class="text-danger" /> 
-            </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
+                <div class="mb-3">
+                    <InputText id="firstname" @bind-Value="Professor.FirstName" class="form-control" placeholder="First Name" />
+                    <ValidationMessage For="() => Professor.FirstName" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <InputText id="lastname" @bind-Value="Professor.LastName" class="form-control" placeholder="Last Name" />
+                    <ValidationMessage For="() => Professor.LastName" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <InputText id="specialty" @bind-Value="Professor.Specialty" class="form-control" placeholder="Specialty" />
+                    <ValidationMessage For="() => Professor.Specialty" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">House:</label>
+                    <InputSelect @bind-Value="Professor.HouseId" class="form-control">
+                        <option value="">-- Select a House --</option>
+                        @foreach (var house in Houses)
+                        {
+                                <option value="@house.HouseId">@house.HouseName</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Professor.HouseId" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="/professors" class="btn btn-secondary ms-2">Back to List</a>
+            </EditForm>
+        </div>
     </div>
 </div>
 
-<div>
-    <a href="/professors">Back to List</a>
-</div>
+@if (AskPet)
+{
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content p-4 text-center">
+                    <h5 class="modal-title">Add a Pet?</h5>
+                    <div class="modal-body">
+                        <p>Would you like to add a pet for @Professor.FirstName?</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary me-2" @onclick="ShowAddPetModalFunc">Yes</button>
+                        <button type="button" class="btn btn-secondary" @onclick="() => NavigateToList()">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+
+@if (ShowAddPetModal)
+{
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content p-4">
+                    <h5 class="modal-title mb-3">Add Pet</h5>
+                    <EditForm Model="newPet" OnValidSubmit="SavePet" FormName="addPetForm">
+                        <DataAnnotationsValidator />
+                        <div class="mb-3">
+                            <label class="form-label">Pet Name</label>
+                            <InputText class="form-control" @bind-Value="newPet.PetName" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Species</label>
+                            <InputText class="form-control" @bind-Value="newPet.Species" />
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success me-2">Save</button>
+                            <button type="button" class="btn btn-secondary" @onclick="() => NavigateToList()">Cancel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+}
 
 @code {
     [SupplyParameterFromForm]
     private Professor Professor { get; set; } = new();
     private List<House> Houses { get; set; } = new();
-    private static readonly Random _random = new Random();
-
-
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task AddProfessor()
-    {
-        using var context = DbFactory.CreateDbContext();
-        Professor.Level = _random.Next(7, 11);
-        context.Professor.Add(Professor);
-        await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/professors");
-    }
+    private bool AskPet = false;
+    private bool ShowAddPetModal = false;
+    private Pet newPet = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Houses = await context.House
-                                 .OrderBy(p => p.HouseName)
-                                 .ToListAsync();
-
-        if (Professor is null)
-        {
-            NavigationManager.NavigateTo("notfound");
-        }
+        Houses = await context.House.OrderBy(h => h.HouseName).ToListAsync();
     }
+
+    private async Task OnCreateProfessor()
+    {
+        Professor.Level = new Random().Next(7, 11);
+
+        using var context = DbFactory.CreateDbContext();
+        context.Professor.Add(Professor);
+        await context.SaveChangesAsync();
+
+        AskPet = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ShowAddPetModalFunc()
+    {
+        AskPet = false;
+        ShowAddPetModal = true;
+        newPet.ProfessorId = Professor.ProfessorId;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SavePet()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Pet.Add(newPet);
+        await context.SaveChangesAsync();
+        NavigateToList();
+    }
+
+    private void NavigateToList() => NavigationManager.NavigateTo("/professors");
 }

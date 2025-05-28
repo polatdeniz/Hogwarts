@@ -1,31 +1,34 @@
 ﻿@page "/enrollments"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using Hogwarts
+@using AbdHogwarts
 @using HogwartsWeb.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 
-<PageTitle>Enrollments</PageTitle>
+<div class="page-container">
 
-<h1>Enrollment</h1>
+    <PageTitle>Enrollments</PageTitle>
 
-<p>
-    <a href="enrollments/create">Create New</a>
-</p>
+    <h1>Enrollment</h1>
 
-<QuickGrid Class="table" Items="context.Enrollment">
-    <PropertyColumn Property='enrollment => enrollment.Student.FirstName + " " + enrollment.Student.LastName' Title="Student" />
-    <PropertyColumn Property="enrollment => enrollment.Course.CourseName" Title="Course" />
-    <PropertyColumn Property='enrollment => enrollment.Professor.FirstName + " " + enrollment.Professor.LastName' Title="Professor" />
-    <PropertyColumn Property="enrollment => enrollment.EnrollmentDate" Title="Enrollment Date" />
+    <p>
+        <a class="btn-create" href="enrollments/create">Create New</a>
+    </p>
+    <QuickGrid Class="quickgrid-table table" Items="context.Enrollment">
+        <PropertyColumn Property='enrollment => enrollment.Student.FirstName + " " + enrollment.Student.LastName' Title="Student" />
+        <PropertyColumn Property="enrollment => enrollment.Course.CourseName" Title="Course" />
+        <PropertyColumn Property='enrollment => enrollment.Professor.FirstName + " " + enrollment.Professor.LastName' Title="Professor" />
+        <PropertyColumn Property="enrollment => enrollment.EnrollmentDate" Title="Enrollment Date" />
 
-    <TemplateColumn Context="enrollment">
-        <a href="@($"enrollments/edit?enrollmentid={enrollment.EnrollmentId}")">Edit</a> |
-        <a href="@($"enrollments/details?enrollmentid={enrollment.EnrollmentId}")">Details</a> |
-        <a href="@($"enrollments/delete?enrollmentid={enrollment.EnrollmentId}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <TemplateColumn Context="enrollment">
+            <a href="@($"enrollments/edit?enrollmentid={enrollment.EnrollmentId}")">Edit</a> |
+            <a href="@($"enrollments/details?enrollmentid={enrollment.EnrollmentId}")">Details</a> |
+            <a href="@($"enrollments/delete?enrollmentid={enrollment.EnrollmentId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+
+</div>
 
 @code {
     private HogwartsWebContext context = default!;

@@ -1,0 +1,83 @@
+﻿/* === Hogwarts Typography === */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@700&display=swap');
+
+body {
+    font-family: 'Crimson Text', serif;
+    color: #2c2c2c;
+}
+
+/* === Sayfa Başlığı === */
+h1.page-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #6a040f;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+/* === Sayfa Kapsayıcı === */
+.page-container {
+    padding: 2rem;
+    background-color: rgba(245, 235, 220, 0.95); /* Pergament kâğıdı rengi */
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+    margin-bottom: 2rem;
+    border: 2px solid #6a040f;
+}
+
+/* === Butonlar === */
+.btn-create {
+    background-color: #740001; /* Gryffindor bordo */
+    color: #fceabb;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 0 5px #000;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .btn-create:hover {
+        background-color: #9e1313;
+        transform: scale(1.05);
+    }
+
+/* === QuickGrid Özelleştirmesi === */
+.quickgrid-table {
+    background-color: #fefae0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #d4a373;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+/* === Ana Arka Plan === */
+.main-layout {
+    min-height: 100vh;
+    padding: 2rem;
+    background-image: url("../images/Hogwarts.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-color: #0b090a;
+}
+
+.bg-blur {
+    background-color: rgba(255, 255, 255, 0.85); /* Yarı saydam beyaz zemin */
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    max-width: 900px;
+    margin: auto;
+}
+
+/* Metinlerin görünürlüğünü artırmak için */
+.page-container h1,
+.page-container h3,
+.page-container dt,
+.page-container dd,
+.page-container li,
+.page-container p {
+    color: #222; /* Koyu metin */
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}

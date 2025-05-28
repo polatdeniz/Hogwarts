@@ -1,54 +1,71 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<style>
+.custom-nav-link {
+    color: #cfcfcf;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.custom-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: translateX(5px);
+}
+
+.custom-nav-link.active {
+    background-color: #ffc107;
+    color: #212529;
+    font-weight: 600;
+    transform: scale(1.05);
+}
+
+.custom-nav-link .bi {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.custom-nav-link:hover .bi {
+    transform: scale(1.3);
+    color: #f8f9fa;
+}
+
+</style>
+
+
+<div class="top-row navbar navbar-dark bg-dark px-3 shadow">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">HogwartsWeb</a>
+        <a class="navbar-brand fw-bold" href="">Hogwarts<span class="text-warning">Web</span></a>
+        <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="courses">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Courses
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="students">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Students
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="professors">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Professors
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="spells">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Spells
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="houses">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Houses
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="enrollments">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Enrollments
-            </NavLink>
-        </div>
+<div class="nav-scrollable bg-dark" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column p-3 text-white">
+        @foreach (var item in NavItems)
+        {
+            <div class="nav-item mb-2">
+                <NavLink class="nav-link custom-nav-link" href="@item.Url" Match="NavLinkMatch.All">
+                    <span class="@item.Icon" aria-hidden="true"></span>
+                    <span class="ms-2">@item.Title</span>
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 
+@code {
+    private record NavItem(string Title, string Url, string Icon);
+
+    private List<NavItem> NavItems = new()
+    {
+        new NavItem("Home", "", "bi bi-house-door-fill"),
+        new NavItem("Courses", "courses", "bi bi-journal-bookmark"),
+        new NavItem("Students", "students", "bi bi-people"),
+        new NavItem("Professors", "professors", "bi bi-person-badge"),
+        new NavItem("Spells", "spells", "bi bi-stars"),
+        new NavItem("Houses", "houses", "bi bi-shield-shaded"),
+        new NavItem("Enrollments", "enrollments", "bi bi-card-checklist")
+    };
+}

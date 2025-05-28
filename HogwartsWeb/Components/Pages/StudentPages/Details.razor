@@ -1,71 +1,246 @@
 ﻿@page "/students/details"
 @using Microsoft.EntityFrameworkCore
-@using Hogwarts
+@using AbdHogwarts
 @rendermode InteractiveServer
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Details</PageTitle>
+<PageTitle>Student Details</PageTitle>
 
-<h1>Student Details</h1>
+<div class="page-container">
+    <h1 class="page-title">Student Details</h1>
 
-@if (student is null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="row">
-        <div class="col-md-6">
-            <dl class="row">
-                <dt class="col-sm-2">First Name</dt>
-                <dd class="col-sm-10">@student.FirstName</dd>
-                <dt class="col-sm-2">Last Name</dt>
-                <dd class="col-sm-10">@student.LastName</dd>
-                <dt class="col-sm-2">Level</dt>
-                <dd class="col-sm-10">@student.Level</dd>
-                <dt class="col-sm-2">House</dt>
-                <dd class="col-sm-10">@student.House.HouseName</dd>
-                <dt class="col-sm-2">Wand ID</dt>
-                <dd class="col-sm-10">@student.WandId</dd>
-            </dl>
+    @if (student is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">First Name</dt>
+                    <dd class="col-sm-8">@student.FirstName</dd>
+
+                    <dt class="col-sm-4">Last Name</dt>
+                    <dd class="col-sm-8">@student.LastName</dd>
+
+                    <dt class="col-sm-4">Level</dt>
+                    <dd class="col-sm-8">@student.Level</dd>
+
+                    <dt class="col-sm-4">House</dt>
+                    <dd class="col-sm-8">@student.House.HouseName</dd>
+
+                    <dt class="col-sm-4">Wand ID</dt>
+                    <dd class="col-sm-8">@student.WandId</dd>
+                </dl>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="mt-2">Wand Details</h4>
+                <dl class="row">
+                    <dt class="col-sm-5">Core</dt>
+                    <dd class="col-sm-7">@student.Wand.Core</dd>
+
+                    <dt class="col-sm-5">Material</dt>
+                    <dd class="col-sm-7">@student.Wand.Material</dd>
+
+                    <dt class="col-sm-5">Creation Date</dt>
+                    <dd class="col-sm-7">@student.Wand.CreationDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-5">Last Maintenance</dt>
+                    <dd class="col-sm-7">
+                        @if (student.Wand.LastMaintenanceDate != null)
+                        {
+                            @student.Wand.LastMaintenanceDate.Value.ToString("yyyy-MM-dd")
+                        }
+                        else
+                        {
+                            <em>Never</em>
+                        }
+                    </dd>
+                </dl>
+
+                @if (student.Wand.LastMaintenanceDate is null || student.Wand.LastMaintenanceDate < DateTime.Now.AddYears(-1))
+                {
+                    <button class="btn btn-warning mt-2" @onclick="PerformMaintenance">Perform Maintenance</button>
+                }
+
+                <p class="text-info mt-2">@statusMessage</p>
+            </div>
         </div>
 
-        <div class="col-md-6">
-            <h2>Wand Details</h2>
-            <dl class="row">
-                <dt class="col-sm-4">Core</dt>
-                <dd class="col-sm-8">@student.Wand.Core</dd>
-                <dt class="col-sm-4">Material</dt>
-                <dd class="col-sm-8">@student.Wand.Material</dd>
-                <dt class="col-sm-4">Creation Date</dt>
-                <dd class="col-sm-8">@student.Wand.CreationDate.ToString("yyyy-MM-dd")</dd>
-                <dt class="col-sm-4">Last Maintenance</dt>
-                <dd class="col-sm-8">@student.Wand.LastMaintenanceDate</dd>
-            </dl>
+        <hr />
+        <h4 class="mt-4">Enrolled Courses</h4>
 
-            @if (student.Wand.LastMaintenanceDate < DateTime.Now.AddYears(-1))
-            {
-                <button type="button"
-                        class="btn btn-warning mb-2"
-                        @onclick="PerformMaintenance">
-                    Maintenance
-                </button>
-            }
-            <p class="text-info">@statusMessage</p>
+        @if (!enrollments.Any())
+        {
+            <p>This student is not enrolled in any courses.</p>
+        }
+        else
+        {
+            <ul class="list-group mt-2">
+                @foreach (var enrollment in enrollments)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@enrollment.Course.CourseName</strong> — taught by @enrollment.Professor.FirstName @enrollment.Professor.LastName
+                            <br />
+                            <small class="text-muted">Enrolled on @enrollment.EnrollmentDate.ToString("yyyy-MM-dd")</small>
+                        </div>
+                        <button class="btn btn-sm btn-danger" @onclick="() => DropCourse(enrollment.EnrollmentId)">Drop</button>
+                    </li>
+                }
+            </ul>
+        }
+
+        <button class="btn btn-success mt-3" @onclick="() => showCourseModal = true">Add New Course</button>
+
+        @if (showCourseModal)
+        {
+            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Available Courses</h5>
+                            <button type="button" class="btn-close" @onclick="() => showCourseModal = false"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="list-group">
+                                @foreach (var course in availableCourses)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @course.CourseName
+                                        <button class="btn btn-sm btn-primary" @onclick="() => EnrollStudent(course.CourseId)">Enroll</button>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <hr />
+        <h4 class="mt-4">Available Spells</h4>
+        @if (spells is null)
+        {
+            <p><em>Loading spells...</em></p>
+        }
+        else if (!spells.Any())
+        {
+            <p><em>No spells available for your level.</em></p>
+        }
+        else
+        {
+            <ul class="list-group mt-2">
+                @foreach (var spell in spells)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@spell.SpellName</strong> (Level @spell.RequiredLevel)
+                        </div>
+                        <button type="button" class="btn btn-sm btn-info" @onclick="() => ShowSpellModal(spell)">Use Spell</button>
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (showSpellModal && selectedSpell != null)
+        {
+            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content p-4">
+                        <div class="modal-body text-dark" style="background: rgba(255,255,255,0.95); border-radius: 0.5rem;">
+                            <div class="d-flex align-items-start">
+                                <img src="/Images/use-spell.png" alt="Spell Icon" style="width: 120px; height: auto; margin-right: 1rem; border-radius: 0.25rem;" />
+                                <div>
+                                    <h5 class="modal-title mb-2">@selectedSpell.SpellName</h5>
+                                    <p class="fw-bold">@selectedSpell.Effect</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-end">
+                                <button type="button" class="btn btn-secondary" @onclick="CloseSpellModal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <hr />
+        <h4 class="mt-4">Pets</h4>
+
+        @if (!pets.Any())
+        {
+            <p>This student has no pets.</p>
+        }
+        else
+        {
+            <ul class="list-group mt-2">
+                @foreach (var pet in pets)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@pet.PetName</strong> — @pet.Species
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+
+        <button class="btn btn-primary mt-3" @onclick="() => showPetModal = true">Add New Pet</button>
+
+        @if (showPetModal)
+        {
+            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add New Pet</h5>
+                            <button type="button" class="btn-close" @onclick="() => showPetModal = false"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Pet Name</label>
+                                <input class="form-control" @bind="newPetName" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Species</label>
+                                <input class="form-control" @bind="newPetSpecies" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" @onclick="() => showPetModal = false">Cancel</button>
+                            <button class="btn btn-success" @onclick="AddPet">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="mt-4">
+            <a class="btn btn-secondary" href="@($"/students/edit?studentid={student.StudentId}")">Edit</a>
+            <a class="btn btn-link" href="/students">Back to List</a>
         </div>
-    </div>
-
-    <div class="mt-3">
-        <a class="btn btn-secondary"
-           href="@($"/students/edit?studentid={student.StudentId}")">Edit</a>
-        <a class="btn btn-link" href="/students">Back to List</a>
-    </div>
-}
+    }
+</div>
 
 @code {
     private Student? student;
-    private string statusMessage = "";
+    private List<Enrollment> enrollments = new();
+    private List<Course> availableCourses = new();
+    private List<Spell>? spells;
+    private Spell? selectedSpell;
+    private List<Pet> pets = new();
+
+    private bool showCourseModal = false;
+    private bool showSpellModal = false;
+    private bool showPetModal = false;
+
+    private string statusMessage = string.Empty;
+    private string newPetName = string.Empty;
+    private string newPetSpecies = string.Empty;
 
     [SupplyParameterFromQuery]
     private int StudentId { get; set; }
@@ -73,27 +248,48 @@ else
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
+
         student = await context.Student
-                               .Include(s => s.Wand)
-                               .Include(s => s.House)
-                               .FirstOrDefaultAsync(s => s.StudentId == StudentId);
+            .Include(s => s.Wand)
+            .Include(s => s.House)
+            .FirstOrDefaultAsync(s => s.StudentId == StudentId);
 
         if (student is null)
         {
             NavigationManager.NavigateTo("notfound");
+            return;
         }
+
+        enrollments = await context.Enrollment
+            .Include(e => e.Course)
+            .Include(e => e.Professor)
+            .Where(e => e.StudentId == student.StudentId)
+            .ToListAsync();
+
+        var enrolledCourseIds = enrollments.Select(e => e.CourseId).ToHashSet();
+        availableCourses = await context.Course
+            .Where(c => !enrolledCourseIds.Contains(c.CourseId))
+            .ToListAsync();
+
+        spells = await context.Spell
+            .Where(sp => sp.RequiredLevel <= student.Level)
+            .OrderBy(sp => sp.RequiredLevel)
+            .ToListAsync();
+
+        pets = await context.Pet
+            .Where(p => p.StudentId == student.StudentId)
+            .ToListAsync();
     }
+
     private async Task PerformMaintenance()
     {
-        statusMessage = "⏳ Bakım işleniyor…";
-
+        statusMessage = "⏳ Performing maintenance...";
         using var context = DbFactory.CreateDbContext();
-        var wand = await context.Wand
-                                .SingleOrDefaultAsync(w => w.WandId == student!.Wand.WandId);
 
+        var wand = await context.Wand.FindAsync(student!.WandId);
         if (wand is null)
         {
-            statusMessage = "⚠️ Asa bulunamadı!";
+            statusMessage = "⚠️ Wand not found!";
             return;
         }
 
@@ -101,7 +297,73 @@ else
         await context.SaveChangesAsync();
 
         student.Wand.LastMaintenanceDate = wand.LastMaintenanceDate;
-        statusMessage = "✅ Son bakım tarihi güncellendi.";
+        statusMessage = "✅ Wand maintenance date updated.";
     }
 
+    private async Task DropCourse(int enrollmentId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var enrollment = await context.Enrollment.FindAsync(enrollmentId);
+
+        if (enrollment is not null)
+        {
+            context.Enrollment.Remove(enrollment);
+            await context.SaveChangesAsync();
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        }
+    }
+
+    private async Task EnrollStudent(int courseId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var professor = await context.Professor.FirstOrDefaultAsync();
+        if (professor is null || student is null) return;
+
+        var enrollment = new Enrollment
+            {
+                CourseId = courseId,
+                StudentId = student.StudentId,
+                ProfessorId = professor.ProfessorId,
+                EnrollmentDate = DateTime.Now
+            };
+
+        context.Enrollment.Add(enrollment);
+        await context.SaveChangesAsync();
+
+        showCourseModal = false;
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    private void ShowSpellModal(Spell spell)
+    {
+        selectedSpell = spell;
+        showSpellModal = true;
+    }
+
+    private void CloseSpellModal()
+    {
+        showSpellModal = false;
+        selectedSpell = null;
+    }
+
+    private async Task AddPet()
+    {
+        if (string.IsNullOrWhiteSpace(newPetName) || string.IsNullOrWhiteSpace(newPetSpecies) || student is null)
+            return;
+
+        using var context = DbFactory.CreateDbContext();
+
+        var pet = new Pet
+            {
+                PetName = newPetName,
+                Species = newPetSpecies,
+                StudentId = student.StudentId
+            };
+
+        context.Pet.Add(pet);
+        await context.SaveChangesAsync();
+
+        showPetModal = false;
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
 }

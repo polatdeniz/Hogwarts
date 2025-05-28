@@ -1,53 +1,51 @@
 ﻿@page "/enrollments/create"
 @using Microsoft.EntityFrameworkCore
-@using Hogwarts
+@using AbdHogwarts
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Create Enrollment</PageTitle>
 
-<h1>Create Enrollment</h1>
+<div class="page-container">
+    <h1 class="page-title">Create Enrollment</h1>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Enrollment" OnValidSubmit="AddEnrollment" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
-            <div class="mb-3">
-                <label for="studentid" class="form-label">Student Id:</label> 
-                <InputNumber id="studentid" @bind-Value="Enrollment.StudentId" class="form-control" /> 
-                <ValidationMessage For="() => Enrollment.StudentId" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="courseid" class="form-label">Course Id:</label> 
-                <InputNumber id="courseid" @bind-Value="Enrollment.CourseId" class="form-control" /> 
-                <ValidationMessage For="() => Enrollment.CourseId" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="professorid" class="form-label">Professor Id:</label> 
-                <InputNumber id="professorid" @bind-Value="Enrollment.ProfessorId" class="form-control" /> 
-                <ValidationMessage For="() => Enrollment.ProfessorId" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="enrollmentdate" class="form-label">Enrollment Date:</label> 
-                <InputDate id="enrollmentdate" @bind-Value="Enrollment.EnrollmentDate" class="form-control" /> 
-                <ValidationMessage For="() => Enrollment.EnrollmentDate" class="text-danger" /> 
-            </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
-    </div>
-</div>
+    <EditForm method="post" Model="Enrollment" OnValidSubmit="AddEnrollment" FormName="create" Enhance>
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
 
-<div>
-    <a href="/enrollments">Back to List</a>
+        <div class="mb-3">
+            <label for="studentid" class="form-label">Student ID:</label>
+            <InputNumber id="studentid" @bind-Value="Enrollment.StudentId" class="form-control" />
+            <ValidationMessage For="() => Enrollment.StudentId" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="courseid" class="form-label">Course ID:</label>
+            <InputNumber id="courseid" @bind-Value="Enrollment.CourseId" class="form-control" />
+            <ValidationMessage For="() => Enrollment.CourseId" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="professorid" class="form-label">Professor ID:</label>
+            <InputNumber id="professorid" @bind-Value="Enrollment.ProfessorId" class="form-control" />
+            <ValidationMessage For="() => Enrollment.ProfessorId" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="enrollmentdate" class="form-label">Enrollment Date:</label>
+            <InputDate id="enrollmentdate" @bind-Value="Enrollment.EnrollmentDate" class="form-control" />
+            <ValidationMessage For="() => Enrollment.EnrollmentDate" class="text-danger" />
+        </div>
+
+        <button type="submit" class="btn-create">Create</button>
+        <a href="/enrollments" class="btn btn-secondary ms-2">Back to List</a>
+    </EditForm>
 </div>
 
 @code {
     [SupplyParameterFromForm]
     private Enrollment Enrollment { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddEnrollment()
     {
         using var context = DbFactory.CreateDbContext();

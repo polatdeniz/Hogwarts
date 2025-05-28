@@ -1,91 +1,191 @@
 ﻿@page "/students/create"
+@rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
-@using Hogwarts
+@using AbdHogwarts
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<div class="page-container d-flex justify-content-center align-items-start py-5">
+    <div class="card shadow-lg" style="width: 480px; border-radius: 1rem;">
+        <div class="card-header text-center bg-dark text-white" style="border-top-left-radius:1rem; border-top-right-radius:1rem;">
+            <h2 class="m-0" style="font-family: 'Crimson Text', serif;">📝 Create Student</h2>
+        </div>
+        <div class="card-body bg-light p-4" style="background-color: rgba(245,235,220,0.95);">
+            <EditForm Model="Student" OnValidSubmit="OnCreateStudent">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger mb-3" />
 
-<h1>Create Student</h1>
-
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Student" OnValidSubmit="AddStudent" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
-            <div class="mb-3">
-                <label for="firstname" class="form-label">First Name:</label> 
-                <InputText id="firstname" @bind-Value="Student.FirstName" class="form-control" /> 
-                <ValidationMessage For="() => Student.FirstName" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="lastname" class="form-label">Last Name:</label> 
-                <InputText id="lastname" @bind-Value="Student.LastName" class="form-control" /> 
-                <ValidationMessage For="() => Student.LastName" class="text-danger" /> 
-            </div>              
-            <div class="mb-3">
-                <label for="houseid" class="form-label">House:</label>
-                <InputSelect id="house"
-                             @bind-Value="Student.HouseId"
-                             class="form-control">
-                    <option value="">-- Select a House --</option>
-                    @foreach (var house in Houses)
+                <div class="mb-4">
+                    <InputText id="firstname" @bind-Value="Student.FirstName" class="form-control form-control-lg" placeholder="First Name" />
+                    <ValidationMessage For="() => Student.FirstName" class="text-danger" />
+                </div>
+                <div class="mb-4">
+                    <InputText id="lastname" @bind-Value="Student.LastName" class="form-control form-control-lg" placeholder="Last Name" />
+                    <ValidationMessage For="() => Student.LastName" class="text-danger" />
+                </div>
+                <div class="mb-4 text-center">
+                    @if (!HouseSelected)
                     {
-                        <option value="@house.HouseId">@house.HouseName</option>
+                        <button type="button" class="btn btn-outline-secondary animate__animated animate__pulse animate__infinite" @onclick="AssignRandomHouse" style="background: transparent; border:none;">
+                            <img src="images/hat.png" alt="Sorting Hat" width="100" height="100" class="img-fluid" />
+                        </button>
                     }
-                </InputSelect>
-                <ValidationMessage For="() => Student.HouseId" class="text-danger" /> 
-            </div>        
-                   
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
+                    else if (SelectedHouseLogo != null)
+                    {
+                        <img src="@SelectedHouseLogo" alt="House Logo" width="100" height="100" class="img-fluid rounded shadow" />
+                    }
+                    @if (SelectedHouseName != null)
+                    {
+                        <div class="mt-2">
+                            <span class="badge bg-warning text-dark px-3 py-2" style="font-size:1.1rem;">
+                                @SelectedHouseName
+                            </span>
+                        </div>
+                    }
+                    <ValidationMessage For="() => Student.HouseId" class="text-danger mt-2" />
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 50px;">Create Student</button>
+                </div>
+            </EditForm>
+        </div>
+        <div class="card-footer text-center bg-transparent">
+            <a href="/students" class="text-decoration-none text-secondary">← Back to List</a>
+        </div>
     </div>
 </div>
 
-<div>
-    <a href="/students">Back to List</a>
-</div>
+<!-- Sorting House Modal -->
+@if (ShowHouseModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.7);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 animate__animated animate__zoomIn">
+                <div class="modal-header bg-dark text-white text-center" style="border-top-left-radius:1rem; border-top-right-radius:1rem;">
+                    <h4 class="modal-title m-auto">🎉 Congrats!</h4>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="fs-5">You have been sorted into <strong>@SelectedHouseName</strong>!</p>
+                    <img src="@SelectedHouseLogo" alt="House Logo" class="img-fluid my-3" style="max-height: 140px;" />
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-success btn-lg" style="border-radius: 50px;" @onclick="CloseHouseModal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Add Pet Prompt Modal -->
+@if (AskPet)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4 text-center">
+                <h5 class="modal-title">Add a Pet?</h5>
+                <div class="modal-body">
+                    <p>Would you like to add a pet for @Student.FirstName?</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-primary me-2" @onclick="ShowAddPetModalFunc">Yes</button>
+                    <button class="btn btn-secondary" @onclick="() => NavigateToList()">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Add Pet Form Modal -->
+@if (ShowAddPetModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content p-4">
+                <h5 class="modal-title mb-3">Add Pet</h5>
+                <EditForm Model="newPet" OnValidSubmit="SavePet">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label class="form-label">Pet Name</label>
+                        <InputText class="form-control" @bind-Value="newPet.PetName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Species</label>
+                        <InputText class="form-control" @bind-Value="newPet.Species" />
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success me-2">Save</button>
+                        <button type="button" class="btn btn-secondary" @onclick="() => NavigateToList()">Cancel</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     [SupplyParameterFromForm]
-    private Student Student { get; set; } = new()
-    {
-        Level = 1
-    };
+    private Student Student { get; set; } = new() { Level = 1 };
+
     private List<House> Houses { get; set; } = new();
     private List<Wand> Wands { get; set; } = new();
-
+    private string? SelectedHouseName;
+    private string? SelectedHouseLogo;
+    private bool HouseSelected = false;
+    private bool ShowHouseModal = false;
+    private bool AskPet = false;
+    private bool ShowAddPetModal = false;
+    private Pet newPet = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-
-        Houses = await context.House
-                                  .OrderBy(p => p.HouseName)
-                                  .ToListAsync();
-
-        Wands = await context.Wand
-    .OrderBy(w => w.WandId)
-    .ToListAsync();
+        Houses = await context.House.OrderBy(p => p.HouseName).ToListAsync();
+        Wands = await context.Wand.OrderBy(w => w.WandId).ToListAsync();
     }
 
-
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task AddStudent()
+    private async Task OnCreateStudent()
     {
-        // Rastgele wand ataması
         var rnd = new Random();
         var pick = Wands[rnd.Next(Wands.Count)];
         Student.WandId = pick.WandId;
 
-        // Burada Level’ı garantiye al:
-        Student.Level = 1;
-
         using var context = DbFactory.CreateDbContext();
         context.Student.Add(Student);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/students");
+
+        ShowHouseModal = false;
+        AskPet = true;
     }
 
+    private void CloseHouseModal() => ShowHouseModal = false;
+
+    private void ShowAddPetModalFunc()
+    {
+        AskPet = false;
+        ShowAddPetModal = true;
+        newPet.StudentId = Student.StudentId;
+    }
+
+    private async Task SavePet()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Pet.Add(newPet);
+        await context.SaveChangesAsync();
+        NavigateToList();
+    }
+
+    private void NavigateToList() => NavigationManager.NavigateTo("/students");
+
+    private async Task AssignRandomHouse()
+    {
+        var rnd = new Random();
+        var selected = Houses[rnd.Next(Houses.Count)];
+        Student.HouseId = selected.HouseId;
+        SelectedHouseName = selected.HouseName;
+        SelectedHouseLogo = $"images/{selected.HouseName}.webp";
+        HouseSelected = true;
+        ShowHouseModal = true;
+        await InvokeAsync(StateHasChanged);
+    }
 }
