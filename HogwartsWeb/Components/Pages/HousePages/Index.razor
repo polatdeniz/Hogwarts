@@ -1,7 +1,7 @@
 ﻿@page "/houses"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using AbdHogwarts
+@using dnzHogwards
 @using HogwartsWeb.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
@@ -10,9 +10,9 @@
     <div class="page-container" >
     <PageTitle>Houses</PageTitle>
 
-    <h1>House</h1>
-
     <p>
+        <h1 class="page-title">House</h1>
+
         <a class="btn-create"  href="houses/create">Create New</a>
     </p>
 

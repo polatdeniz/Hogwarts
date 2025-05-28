@@ -1,0 +1,80 @@
+﻿@page "/pets/delete"
+@using Microsoft.EntityFrameworkCore
+@using dnzHogwards
+@using HogwartsWeb.Data
+@inject IDbContextFactory<HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete Pet</PageTitle>
+
+<div class="page-container">
+    <h1 class="page-title">Delete Pet</h1>
+
+    <p>Are you sure you want to delete this pet?</p>
+    <hr />
+
+    @if (pet is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-3">Pet Name:</dt>
+            <dd class="col-sm-9">@pet.PetName</dd>
+
+            <dt class="col-sm-3">Species:</dt>
+            <dd class="col-sm-9">@pet.Species</dd>
+
+            <dt class="col-sm-3">Student Owner:</dt>
+            <dd class="col-sm-9">
+                @(pet.Student is not null 
+                    ? $"{pet.Student.FirstName} {pet.Student.LastName}" 
+                    : "(No Student)")
+            </dd>
+
+            <dt class="col-sm-3">Professor Owner:</dt>
+            <dd class="col-sm-9">
+                @(pet.Professor is not null 
+                    ? $"{pet.Professor.FirstName} {pet.Professor.LastName}" 
+                    : "(No Professor)")
+            </dd>
+        </dl>
+
+        <EditForm method="post" Model="pet" OnValidSubmit="DeletePet" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger me-2" disabled="@(pet is null)">
+                Delete
+            </button>
+            <a href="/pets" class="btn btn-secondary">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Pet? pet;
+
+    [SupplyParameterFromQuery]
+    private int PetId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        pet = await context.Pet
+            .Include(p => p.Student)
+            .Include(p => p.Professor)
+            .FirstOrDefaultAsync(m => m.PetId == PetId);
+
+        if (pet is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeletePet()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Pet.Remove(pet!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/pets");
+    }
+}

@@ -1,0 +1,108 @@
+﻿@page "/pets/edit"
+@using Microsoft.EntityFrameworkCore
+@using dnzHogwards
+@using HogwartsWeb.Data
+@inject IDbContextFactory<HogwartsWebContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Pet</PageTitle>
+
+<div class="page-container">
+    <h1 class="page-title">Edit Pet</h1>
+
+    @if (Pet is null)
+    {
+        <p><em>Loading…</em></p>
+    }
+    else
+    {
+        <p>
+            <a class="btn-create" href="/pets">← Back to List</a>
+        </p>
+
+        <div class="card form-card">
+            <div class="card-body">
+                <EditForm Model="Pet" OnValidSubmit="UpdatePet">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger mb-3" />
+
+                    <!-- Burada plain HTML gizli alan -->
+                    <input type="hidden" @bind="Pet.PetId" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="petName" class="form-label">Pet Name</label>
+                            <InputText id="petName" class="form-control" @bind-Value="Pet.PetName" />
+                            <ValidationMessage For="() => Pet.PetName" class="text-danger" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="species" class="form-label">Species</label>
+                            <InputText id="species" class="form-control" @bind-Value="Pet.Species" />
+                            <ValidationMessage For="() => Pet.Species" class="text-danger" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="studentId" class="form-label">Student</label>
+                            <InputSelect id="studentId" class="form-select" @bind-Value="Pet.StudentId">
+                                <option value="">(No Student)</option>
+                                @foreach (var s in students)
+                                {
+                                    <option value="@s.StudentId">@s.FirstName @s.LastName</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Pet.StudentId" class="text-danger" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="professorId" class="form-label">Professor</label>
+                            <InputSelect id="professorId" class="form-select" @bind-Value="Pet.ProfessorId">
+                                <option value="">(No Professor)</option>
+                                @foreach (var p in professors)
+                                {
+                                    <option value="@p.ProfessorId">@p.FirstName @p.LastName</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => Pet.ProfessorId" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn-create">Save</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Student> students = new();
+    private List<Professor> professors = new();
+
+    [SupplyParameterFromQuery]
+    private int PetId { get; set; }
+
+    [SupplyParameterFromForm]
+    private Pet? Pet { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        students = await context.Student.OrderBy(s => s.FirstName).ToListAsync();
+        professors = await context.Professor.OrderBy(p => p.FirstName).ToListAsync();
+
+        Pet ??= await context.Pet
+            .Include(p => p.Student)
+            .Include(p => p.Professor)
+            .FirstOrDefaultAsync(x => x.PetId == PetId);
+
+        if (Pet is null)
+            NavigationManager.NavigateTo("notfound");
+    }
+
+    private async Task UpdatePet()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Pet!).State = EntityState.Modified;
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/pets");
+    }
+}

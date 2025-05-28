@@ -1,16 +1,16 @@
 ﻿@page "/professors"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using AbdHogwarts
+@using dnzHogwards
 @using HogwartsWeb.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
 
+<PageTitle>Professors</PageTitle>
 
     <div class="page-container">
-    <PageTitle>Professor</PageTitle>
-
-    <h1>Professor</h1>
+    
+        <h1>Professor</h1>
 
     <p>
         <a class="btn-create" href="professors/create">Create New</a>

@@ -1,7 +1,7 @@
 ﻿@page "/students"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using AbdHogwarts
+@using dnzHogwards
 @using HogwartsWeb.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
@@ -9,10 +9,10 @@
 <PageTitle>Students</PageTitle>
 
 <div class="page-container">
-    <h1 class="page-title">Students</h1>
+    <h1 class="page-title">Student</h1>
 
     <p>
-        <a class="btn-create" href="students/create">+ Create New</a>
+        <a class="btn-create" href="students/create">Create New</a>
     </p>
 
     <QuickGrid Class="quickgrid-table table" Items="context.Student">
@@ -35,13 +35,8 @@
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
-
-        // Eager load related data for grid display
         context.House.ToList();
         context.Pet.ToList();
-
-        // Eğer öğrenci dersleri de listelenmek istenirse:
-        // context.Course.ToList();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

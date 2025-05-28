@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AbdHogwarts\AbdHogwarts.csproj" />
+    <ProjectReference Include="..\dnzHogwards\dnzHogwards.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using AbdHogwarts;
+using dnzHogwards;
 
 namespace HogwartsWeb.Data
 {
@@ -14,15 +14,15 @@ namespace HogwartsWeb.Data
         {
         }
 
-        public DbSet<AbdHogwarts.Course> Course { get; set; } = default!;
-        public DbSet<AbdHogwarts.Enrollment> Enrollment { get; set; } = default!;
-        public DbSet<AbdHogwarts.House> House { get; set; } = default!;
-        public DbSet<AbdHogwarts.Pet> Pet { get; set; } = default!;
-        public DbSet<AbdHogwarts.Professor> Professor { get; set; } = default!;
-        public DbSet<AbdHogwarts.Spell> Spell { get; set; } = default!;
-        public DbSet<AbdHogwarts.Student> Student { get; set; } = default!;
-        public DbSet<AbdHogwarts.Wand> Wand { get; set; } = default!;
-        public DbSet<AbdHogwarts.WandMaintenanceAlert> WandMaintenanceAlert { get; set; } = default!;
+        public DbSet<dnzHogwards.Course> Course { get; set; } = default!;
+        public DbSet<dnzHogwards.Enrollment> Enrollment { get; set; } = default!;
+        public DbSet<dnzHogwards.House> House { get; set; } = default!;
+        public DbSet<dnzHogwards.Pet> Pet { get; set; } = default!;
+        public DbSet<dnzHogwards.Professor> Professor { get; set; } = default!;
+        public DbSet<dnzHogwards.Spell> Spell { get; set; } = default!;
+        public DbSet<dnzHogwards.Student> Student { get; set; } = default!;
+        public DbSet<dnzHogwards.Wand> Wand { get; set; } = default!;
+        public DbSet<dnzHogwards.WandMaintenanceAlert> WandMaintenanceAlert { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

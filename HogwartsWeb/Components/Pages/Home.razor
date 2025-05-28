@@ -2,11 +2,10 @@
 
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
-@using AbdHogwarts
+@using dnzHogwards
 @using HogwartsWeb.Data
 @implements IAsyncDisposable
-@inject IDbContextFactory<HogwartsWeb.Data.HogwartsWebContext> DbFactory
-
+@inject IDbContextFactory<HogwartsWebContext> DbFactory
 
 <style>
     body {
@@ -89,6 +88,7 @@ else
             @foreach (var house in houses)
             {
                 var (bgColor, textColor, logoUrl) = GetHouseTheme(house.HouseName);
+                var stats = houseStats.TryGetValue(house.HouseId, out var s) ? s : null;
 
                 <div class="col-md-6 col-lg-3 d-flex">
                     <div class="card m-2 glass-card shadow flex-fill" style="border-top: 5px solid @bgColor;">
@@ -97,6 +97,14 @@ else
                             <h5 class="card-title">@house.HouseName</h5>
                             <p class="card-text"><strong>Founder:</strong> @house.Founder</p>
                             <p class="card-text"><strong>Symbol:</strong> @house.Symbol</p>
+
+                            @if (stats is not null)
+                            {
+                                <hr />
+                                <p class="card-text mb-1"><strong>Students:</strong> @stats.StudentCount (@stats.StudentPercentage.ToString("0.#")%)</p>
+                                <p class="card-text"><strong>Professors:</strong> @stats.ProfessorCount (@stats.ProfessorPercentage.ToString("0.#")%)</p>
+                            }
+
                             <a class="btn btn-hogwarts mt-2" href="@($"houses/details?houseid={house.HouseId}")">View Details</a>
                         </div>
                     </div>
@@ -111,10 +119,55 @@ else
     private HogwartsWebContext context = default!;
     private List<House>? houses;
 
+    // Statistics store keyed by HouseId
+    private Dictionary<int, HouseStats> houseStats = new();
+
+    private class HouseStats
+    {
+        public int HouseId { get; set; }
+        public int StudentCount { get; set; }
+        public double StudentPercentage { get; set; }
+        public int ProfessorCount { get; set; }
+        public double ProfessorPercentage { get; set; }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
+
+        // Load houses
         houses = await context.House.ToListAsync();
+
+        // --- Calculate statistics --------------------------------------------------
+        var totalStudents = await context.Student.CountAsync();
+        var studentCounts = await context.Student
+            .GroupBy(s => s.HouseId)
+            .Select(g => new { HouseId = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        var professorQuery = context.Professor.Where(p => p.HouseId != null);
+        var totalProfessors = await professorQuery.CountAsync();
+        var professorCounts = await professorQuery
+            .GroupBy(p => p.HouseId)
+            .Select(g => new { HouseId = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        foreach (var house in houses)
+        {
+            var sCount = studentCounts.FirstOrDefault(c => c.HouseId == house.HouseId)?.Count ?? 0;
+            var pCount = professorCounts.FirstOrDefault(c => c.HouseId == house.HouseId)?.Count ?? 0;
+
+            houseStats[house.HouseId] = new HouseStats
+            {
+                HouseId = house.HouseId,
+                StudentCount = sCount,
+                StudentPercentage = totalStudents == 0 ? 0 : (double)sCount / totalStudents * 100,
+                ProfessorCount = pCount,
+                ProfessorPercentage = totalProfessors == 0 ? 0 : (double)pCount / totalProfessors * 100
+            };
+        }
+        // --------------------------------------------------------------------------
+
         headmaster = await context.Professor.FirstOrDefaultAsync(p => p.FirstName == "Albus");
     }
 
