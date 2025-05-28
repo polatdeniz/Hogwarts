@@ -32,26 +32,18 @@
                 <dd class="col-sm-9">@house.Colors</dd>
             </dl>
 
-        @if (hasStudents)
-        {
-                    <div class="alert alert-warning">
-                        This house has student(s) assigned. Please move the students to another house before deleting.
-                    </div>
-                    <a href="/houses" class="btn btn-secondary">Back to List</a>
-        }
-        else
-        {
+       
                             <EditForm Model="house" OnValidSubmit="DeleteHouse" FormName="deleteHouseForm">
             <button type="submit" class="btn btn-danger me-2">Delete</button>
             <a href="/houses" class="btn btn-secondary">Back to List</a>
         </EditForm>
-        }
+        
     }
 </div>
 
 @code {
     private House? house;
-    private bool hasStudents = false;
+   
 
     [SupplyParameterFromQuery]
     private int HouseId { get; set; }
@@ -68,20 +60,63 @@
             return;
         }
 
-        hasStudents = await context.Student.AnyAsync(s => s.HouseId == HouseId);
+       
     }
-
     private async Task DeleteHouse()
     {
         using var context = DbFactory.CreateDbContext();
 
+        // Silinmek üzere olan house'u bul
         var houseToDelete = await context.House.FindAsync(HouseId);
-        if (houseToDelete is not null)
+        if (houseToDelete is null)
         {
-            context.House.Remove(houseToDelete);
-            await context.SaveChangesAsync();
+            NavigationManager.NavigateTo("/houses");
+            return;
         }
+
+        // Mevcut, silinmeyecek HouseId'lerden rastgele birini seç
+        var otherHouseIds = await context.House
+            .Where(h => h.HouseId != HouseId)
+            .Select(h => h.HouseId)
+            .ToListAsync();
+
+        if (!otherHouseIds.Any())
+        {
+            // Hiç başka house yoksa silme işlemi yapılamaz, geri dön
+            // Gerekirse kullanıcıya mesaj göster
+            return;
+        }
+
+        // Rastgele geçerli HouseId seç
+        var random = new Random();
+        var newHouseId = otherHouseIds[random.Next(otherHouseIds.Count)];
+
+        // Öğrencilerin HouseId'sini güncelle
+        var studentsToUpdate = await context.Student
+            .Where(s => s.HouseId == HouseId)
+            .ToListAsync();
+
+        foreach (var student in studentsToUpdate)
+        {
+            student.HouseId = newHouseId;
+        }
+
+        // Profesörlerin HouseId'sini güncelle
+        var professorsToUpdate = await context.Professor
+            .Where(p => p.HouseId == HouseId)
+            .ToListAsync();
+
+        foreach (var professor in professorsToUpdate)
+        {
+            professor.HouseId = newHouseId;
+        }
+
+        // House'u sil
+        context.House.Remove(houseToDelete);
+
+        await context.SaveChangesAsync();
 
         NavigationManager.NavigateTo("/houses");
     }
+
 }
