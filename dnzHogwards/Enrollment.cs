@@ -19,7 +19,7 @@ namespace dnzHogwards
         public int CourseId { get; set; }
         public int ProfessorId { get; set; }
         public System.DateTime EnrollmentDate { get; set; }
-    
+        public string ProfessorFullName => Professor == null ? "-" : $"{Professor.FirstName} {Professor.LastName}";
         public virtual Course Course { get; set; }
         public virtual Professor Professor { get; set; }
         public virtual Student Student { get; set; }

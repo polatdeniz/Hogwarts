@@ -4,17 +4,16 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="66933d7e55b84161b1f260cf921643fe" Name="Diagram1">
-        <EntityTypeShape EntityType="HogwardsModel.Course" Width="1.5" PointX="5.25" PointY="5.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="HogwardsModel.Enrollment" Width="1.5" PointX="7.5" PointY="5" IsExpanded="true" />
+      <Diagram DiagramId="61563c2b21454c53b000e1ed3fe6672d" Name="Diagram1">
+        <EntityTypeShape EntityType="HogwardsModel.Course" Width="1.5" PointX="3" PointY="9.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="HogwardsModel.Enrollment" Width="1.5" PointX="5.25" PointY="5" IsExpanded="true" />
         <EntityTypeShape EntityType="HogwardsModel.House" Width="1.5" PointX="0.75" PointY="5" IsExpanded="true" />
-        <EntityTypeShape EntityType="HogwardsModel.Pet" Width="1.5" PointX="5.25" PointY="2" IsExpanded="true" />
-        <EntityTypeShape EntityType="HogwardsModel.Professor" Width="1.5" PointX="3" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="HogwardsModel.Spell" Width="1.5" PointX="7.75" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="HogwardsModel.Pet" Width="1.5" PointX="8.25" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="HogwardsModel.Professor" Width="1.5" PointX="3" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="HogwardsModel.Spell" Width="1.5" PointX="5.75" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="HogwardsModel.Student" Width="1.5" PointX="3" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="HogwardsModel.Wand" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="HogwardsModel.WandMaintenanceAlert" Width="1.5" PointX="3" PointY="9.25" IsExpanded="true" />
-        <AssociationConnector Association="HogwardsModel.FK_Course_Professor" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="HogwardsModel.WandMaintenanceAlert" Width="1.5" PointX="3" PointY="12.25" IsExpanded="true" />
         <AssociationConnector Association="HogwardsModel.FK_Enrollment_Course" ManuallyRouted="false" />
         <AssociationConnector Association="HogwardsModel.FK_Enrollment_Professor" ManuallyRouted="false" />
         <AssociationConnector Association="HogwardsModel.FK_Enrollment_Student" ManuallyRouted="false" />
@@ -24,6 +23,7 @@
         <AssociationConnector Association="HogwardsModel.FK_Pet_Student" ManuallyRouted="false" />
         <AssociationConnector Association="HogwardsModel.FK_Student_Wand" ManuallyRouted="false" />
         <AssociationConnector Association="HogwardsModel.FK_WandMaintenanceAlert_Wand" ManuallyRouted="false" />
+        <AssociationConnector Association="HogwardsModel.FK_Course_Professor" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

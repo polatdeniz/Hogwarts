@@ -30,7 +30,6 @@ namespace dnzHogwards
         public int WandId { get; set; }
         public string PetNames => Pets != null && Pets.Any() ? string.Join(", ", Pets.Select(p => p.PetName)) : "(Pet yok)";
 
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Enrollment> Enrollments { get; set; }
         public virtual House House { get; set; }

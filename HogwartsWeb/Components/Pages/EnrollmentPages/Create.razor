@@ -9,31 +9,59 @@
 <div class="page-container">
     <h1 class="page-title">Create Enrollment</h1>
 
-    <EditForm method="post" Model="Enrollment" OnValidSubmit="AddEnrollment" FormName="create" Enhance>
+    <EditForm Model="Enrollment" OnValidSubmit="AddEnrollment" FormName="create" Enhance>
         <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger" role="alert" />
+        <ValidationSummary class="text-danger" />
 
+        <!---- STUDENT ---->
         <div class="mb-3">
-            <label for="studentid" class="form-label">Student ID:</label>
-            <InputNumber id="studentid" @bind-Value="Enrollment.StudentId" class="form-control" />
+            <label class="form-label" for="student">Student:</label>
+            <InputSelect id="student"
+                         @bind-Value="Enrollment.StudentId"
+                         class="form-control">
+                <option value="">-- Select a Student --</option>
+                @foreach (var s in Students)
+                {
+                    <option value="@s.StudentId">@($"{s.FirstName} {s.LastName}")</option>
+                }
+            </InputSelect>
             <ValidationMessage For="() => Enrollment.StudentId" class="text-danger" />
         </div>
 
+        <!---- COURSE ---->
         <div class="mb-3">
-            <label for="courseid" class="form-label">Course ID:</label>
-            <InputNumber id="courseid" @bind-Value="Enrollment.CourseId" class="form-control" />
+            <label class="form-label" for="course">Course:</label>
+            <InputSelect id="course"
+                         @bind-Value="Enrollment.CourseId"
+                         class="form-control">
+                <option value="">-- Select a Course --</option>
+                @foreach (var c in Courses)
+                {
+                    <option value="@c.CourseId">@c.CourseName</option>
+                }
+            </InputSelect>
             <ValidationMessage For="() => Enrollment.CourseId" class="text-danger" />
         </div>
 
+        <!---- PROFESSOR ---->
         <div class="mb-3">
-            <label for="professorid" class="form-label">Professor ID:</label>
-            <InputNumber id="professorid" @bind-Value="Enrollment.ProfessorId" class="form-control" />
+            <label class="form-label" for="professor">Professor:</label>
+            <InputSelect id="professor"
+                         @bind-Value="Enrollment.ProfessorId"
+                         class="form-control">
+                <option value="">-- Select a Professor --</option>
+                @foreach (var p in Professors)
+                {
+                    <option value="@p.ProfessorId">@($"{p.FirstName} {p.LastName}")</option>
+                }
+            </InputSelect>
             <ValidationMessage For="() => Enrollment.ProfessorId" class="text-danger" />
         </div>
 
+        <!---- DATE ---->
         <div class="mb-3">
-            <label for="enrollmentdate" class="form-label">Enrollment Date:</label>
-            <InputDate id="enrollmentdate" @bind-Value="Enrollment.EnrollmentDate" class="form-control" />
+            <label class="form-label" for="date">Enrollment Date:</label>
+            <InputDate id="date" @bind-Value="Enrollment.EnrollmentDate" class="form-control" />
             <ValidationMessage For="() => Enrollment.EnrollmentDate" class="text-danger" />
         </div>
 
@@ -46,11 +74,37 @@
     [SupplyParameterFromForm]
     private Enrollment Enrollment { get; set; } = new();
 
+    /* Dropdown kaynak listeleri */
+    private List<Student> Students { get; set; } = new();
+    private List<Course> Courses { get; set; } = new();
+    private List<Professor> Professors { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var ctx = DbFactory.CreateDbContext();
+
+        Students = await ctx.Student
+                              .OrderBy(s => s.FirstName)
+                              .ThenBy(s => s.LastName)
+                              .ToListAsync();
+
+        Courses = await ctx.Course
+                              .OrderBy(c => c.CourseName)
+                              .ToListAsync();
+
+        Professors = await ctx.Professor
+                              .OrderBy(p => p.FirstName)
+                              .ThenBy(p => p.LastName)
+                              .ToListAsync();
+    }
+
     private async Task AddEnrollment()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Enrollment.Add(Enrollment);
-        await context.SaveChangesAsync();
+        using var ctx = DbFactory.CreateDbContext();
+
+        ctx.Enrollment.Add(Enrollment);
+        await ctx.SaveChangesAsync();
+
         NavigationManager.NavigateTo("/enrollments");
     }
 }

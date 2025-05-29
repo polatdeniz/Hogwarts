@@ -20,7 +20,6 @@ namespace dnzHogwards
         public int WandId { get; set; }
         public System.DateTime AlertDate { get; set; }
         public string Message { get; set; }
-    
         public virtual Wand Wand { get; set; }
     }
 }

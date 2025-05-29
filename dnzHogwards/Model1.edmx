@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="HogwardsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="HogwardsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Course">
           <Key>
             <PropertyRef Name="CourseId" />
@@ -12,7 +12,7 @@
           <Property Name="CourseId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CourseName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="Description" Type="varchar" MaxLength="255" />
-          <Property Name="ProfessorId" Type="int" Nullable="false" />
+          <Property Name="ProfessorId" Type="int" />
         </EntityType>
         <EntityType Name="Enrollment">
           <Key>
@@ -95,7 +95,7 @@
           <Property Name="Message" Type="varchar" MaxLength="255" Nullable="false" />
         </EntityType>
         <Association Name="FK_Course_Professor">
-          <End Role="Professor" Type="Self.Professor" Multiplicity="1" />
+          <End Role="Professor" Type="Self.Professor" Multiplicity="0..1" />
           <End Role="Course" Type="Self.Course" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Professor">
@@ -273,8 +273,7 @@
             <End Role="WandMaintenanceAlert" EntitySet="WandMaintenanceAlert" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="HogwardsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -285,9 +284,9 @@
           <Property Name="CourseId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="CourseName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="ProfessorId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Professor" Relationship="Self.FK_Course_Professor" FromRole="Course" ToRole="Professor" />
+          <Property Name="ProfessorId" Type="Int32" />
           <NavigationProperty Name="Enrollments" Relationship="Self.FK_Enrollment_Course" FromRole="Course" ToRole="Enrollment" />
+          <NavigationProperty Name="Professor" Relationship="HogwardsModel.FK_Course_Professor" FromRole="Course" ToRole="Professor" />
         </EntityType>
         <EntityType Name="Enrollment">
           <Key>
@@ -336,10 +335,10 @@
           <Property Name="Specialty" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Level" Type="Int32" Nullable="false" />
           <Property Name="HouseId" Type="Int32" />
-          <NavigationProperty Name="Courses" Relationship="Self.FK_Course_Professor" FromRole="Professor" ToRole="Course" />
           <NavigationProperty Name="Enrollments" Relationship="Self.FK_Enrollment_Professor" FromRole="Professor" ToRole="Enrollment" />
           <NavigationProperty Name="House" Relationship="Self.FK_Professor_House" FromRole="Professor" ToRole="House" />
           <NavigationProperty Name="Pets" Relationship="Self.FK_Pet_Professor" FromRole="Professor" ToRole="Pet" />
+          <NavigationProperty Name="Courses" Relationship="HogwardsModel.FK_Course_Professor" FromRole="Professor" ToRole="Course" />
         </EntityType>
         <EntityType Name="Spell">
           <Key>
@@ -387,18 +386,6 @@
           <Property Name="Message" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Wand" Relationship="Self.FK_WandMaintenanceAlert_Wand" FromRole="WandMaintenanceAlert" ToRole="Wand" />
         </EntityType>
-        <Association Name="FK_Course_Professor">
-          <End Role="Professor" Type="Self.Professor" Multiplicity="1" />
-          <End Role="Course" Type="Self.Course" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Professor">
-              <PropertyRef Name="ProfessorId" />
-            </Principal>
-            <Dependent Role="Course">
-              <PropertyRef Name="ProfessorId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Enrollment_Course">
           <End Role="Course" Type="Self.Course" Multiplicity="1" />
           <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
@@ -525,10 +512,6 @@
           <EntitySet Name="Students" EntityType="Self.Student" />
           <EntitySet Name="Wands" EntityType="Self.Wand" />
           <EntitySet Name="WandMaintenanceAlerts" EntityType="Self.WandMaintenanceAlert" />
-          <AssociationSet Name="FK_Course_Professor" Association="Self.FK_Course_Professor">
-            <End Role="Professor" EntitySet="Professors" />
-            <End Role="Course" EntitySet="Courses" />
-          </AssociationSet>
           <AssociationSet Name="FK_Enrollment_Course" Association="Self.FK_Enrollment_Course">
             <End Role="Course" EntitySet="Courses" />
             <End Role="Enrollment" EntitySet="Enrollments" />
@@ -565,7 +548,23 @@
             <End Role="Wand" EntitySet="Wands" />
             <End Role="WandMaintenanceAlert" EntitySet="WandMaintenanceAlerts" />
           </AssociationSet>
+          <AssociationSet Name="FK_Course_Professor" Association="HogwardsModel.FK_Course_Professor">
+            <End Role="Professor" EntitySet="Professors" />
+            <End Role="Course" EntitySet="Courses" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK_Course_Professor">
+          <End Type="HogwardsModel.Professor" Role="Professor" Multiplicity="0..1" />
+          <End Type="HogwardsModel.Course" Role="Course" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Professor">
+              <PropertyRef Name="ProfessorId" />
+            </Principal>
+            <Dependent Role="Course">
+              <PropertyRef Name="ProfessorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->

@@ -18,7 +18,7 @@
     <QuickGrid Class="quickgrid-table table" Items="context.Enrollment">
         <PropertyColumn Property='enrollment => enrollment.Student.FirstName + " " + enrollment.Student.LastName' Title="Student" />
         <PropertyColumn Property="enrollment => enrollment.Course.CourseName" Title="Course" />
-        <PropertyColumn Property='enrollment => enrollment.Professor.FirstName + " " + enrollment.Professor.LastName' Title="Professor" />
+        <PropertyColumn Property="enrollment => enrollment.ProfessorFullName" Title="Professor" />
         <PropertyColumn Property="enrollment => enrollment.EnrollmentDate" Title="Enrollment Date" />
 
         <TemplateColumn Context="enrollment">

@@ -18,9 +18,9 @@ namespace dnzHogwards
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Professor()
         {
-            this.Courses = new HashSet<Course>();
             this.Enrollments = new HashSet<Enrollment>();
             this.Pets = new HashSet<Pet>();
+            this.Courses = new HashSet<Course>();
         }
     
         public int ProfessorId { get; set; }
@@ -29,15 +29,14 @@ namespace dnzHogwards
         public string Specialty { get; set; }
         public int Level { get; set; }
         public Nullable<int> HouseId { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public string PetNames => Pets != null && Pets.Any() ? string.Join(", ", Pets.Select(p => p.PetName)) : "(Pet yok)";
 
-        public virtual ICollection<Course> Courses { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Enrollment> Enrollments { get; set; }
         public virtual House House { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Pet> Pets { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Course> Courses { get; set; }
     }
 }
